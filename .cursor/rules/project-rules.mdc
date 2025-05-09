@@ -1,0 +1,107 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+**General Principles**
+- Always plan in detailed pseudocode before coding.
+- Only make necessary, fully justified changes.
+- Code must be: DRY, bug-free, complete, and easy to read.
+- No TODOs, placeholders, or missing pieces. All code must be final and functional.
+- Always include required imports
+- Use clear, consistent naming.
+- Minimize prose; be concise and direct.
+- If unsure, say so—never guess.
+
+**Code Implementation**
+- Use early returns for clarity.
+- Style only with Tailwind classes; never use CSS files or inline styles.
+- Add accessibility: e.g., `tabindex`, `aria-label`, `onClick`, `onKeyDown` on interactive elements.
+- Define types where possible.
+- Update `directory-tree.txt` in the project root with every new/removed file or route. Treat it as the source of truth for structure.
+
+**Next.js Page & Component Structure**
+- Page props (`params`, `searchParams`) are promises; always `await` them.
+- Main page components are async.
+- Server components fetch data and render client components.
+- Keep server and client logic separate.
+
+## Schema Conventions
+
+- Database tables use underscores (snake_case), e.g., `user_profile`
+- Foreign keys typically follow the pattern: `[table_name]_id`
+- Standard timestamp fields are typically included:
+  - `created_at`
+  - `updated_at`
+  - `deleted_at`
+
+## Best Practices
+
+- Start with clear specifications in natural language
+- Iterate and refine through conversational interface
+- Integrate with version control systems
+- Regularly update API keys and monitor access
+- Provide feedback on generated outputs to improve capabilities
+
+## Best Practices
+
+1. **Server vs Client Auth**
+   - Never mix server and client auth methods
+
+2. **Modal vs Redirect**
+   - Use `mode="modal"` for inline feature gating
+   - Use redirect mode for full-page auth requirements
+
+3. **Loading States**
+   - Always handle `isLoaded` state in client components
+   - Provide appropriate loading UI to prevent flashing
+
+4. **Error Handling**
+   - Catch and handle authentication errors gracefully with feedback when authentication is required
+
+## Examples
+
+# Next.js Page Props Rule
+
+This rule defines how to handle page props in Next.js components for pages that receive params or searchParams.
+
+## Rule Details
+1. Page props should be typed with Promise for params and searchParams
+2. The main page component should be async
+3. Params should be awaited at the start of the component
+4. Client-side state management should be moved to a separate client component
+
+### Example:
+
+```typescript
+interface PageProps {
+  params: Promise<{
+    slug: string
+  }>,
+  searchParams?: Promise<{
+    query?: string
+  }>
+}
+
+export default async function Page({ params, searchParams }: PageProps) {
+  const { slug } = await params
+  const { query } = await searchParams || {}
+
+  // Server-side data fetching here
+  const data = await getData(slug)
+
+  return (
+    <ClientComponent data={data} />
+  )
+}
+
+'use client'
+function ClientComponent({ data }: { data: Data }) {
+  // Client-side state management here
+  const [state, setState] = useState()
+  
+  return (
+    // JSX
+  )
+}
+```
