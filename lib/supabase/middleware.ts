@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
 // Define public routes that don't require authentication
-const PUBLIC_ROUTES = ["/", "/login", "/auth"]
+const PUBLIC_ROUTES = ["/", "/login", "/register", "/auth", "/reset-password"]
 
 // Check if the current path starts with any of the public routes
 const isPublicRoute = (pathname: string) => {

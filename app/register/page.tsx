@@ -4,45 +4,63 @@ import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Icons } from "@/components/ui/icons"
-import { LoginFormValues, loginSchema } from "@/lib/validations/auth"
-import { login } from "./actions"
+import { Checkbox } from "@/components/ui/checkbox"
+import { RegisterFormValues, registerSchema } from "@/lib/validations/auth"
+import { register } from "./actions"
 
-export default function LoginPage() {
+export default function RegisterPage() {
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
+      firstName: "",
+      lastName: "",
+      acceptTerms: false,
     },
   })
 
-  async function onSubmit(data: LoginFormValues) {
+  async function onSubmit(data: RegisterFormValues) {
     setIsLoading(true)
     setError(null)
+    setSuccess(null)
 
     try {
       const formData = new FormData()
       formData.append("email", data.email)
       formData.append("password", data.password)
+      formData.append("confirmPassword", data.confirmPassword)
+      formData.append("firstName", data.firstName)
+      formData.append("lastName", data.lastName)
+      formData.append("acceptTerms", data.acceptTerms.toString())
 
-      const result = await login(formData)
+      const result = await register(formData)
 
-      // If result exists and has an error property, something went wrong
       if (result && !result.success) {
-        setError(result.error || "An error occurred during login")
+        setError(result.error || "Registration failed. Please try again.")
         setIsLoading(false)
+      } else if (result && result.success) {
+        setSuccess(result.message || "Registration successful! Please check your email to confirm your account.")
+        setIsLoading(false)
+        // Redirect after 3 seconds
+        setTimeout(() => {
+          router.push("/login")
+        }, 3000)
       }
-      // If no result or no error property, redirect should have occurred
     } catch (err) {
-      console.error("Login error:", err)
+      console.error("Registration error:", err)
       setError("An unexpected error occurred. Please try again.")
       setIsLoading(false)
     }
@@ -80,10 +98,10 @@ export default function LoginPage() {
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Welcome back
+              Create an account
             </h1>
             <p className="text-sm text-muted-foreground">
-              Enter your credentials to sign in to your account
+              Sign up to join the 10 Ocean Tenant Association
             </p>
           </div>
 
@@ -93,9 +111,42 @@ export default function LoginPage() {
                 {error}
               </div>
             )}
+            
+            {success && (
+              <div className="bg-green-100 text-green-800 text-sm p-3 rounded-md">
+                {success}
+              </div>
+            )}
 
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className="grid gap-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-2">
+                    <Label htmlFor="firstName">First name</Label>
+                    <Input
+                      id="firstName"
+                      placeholder="First name"
+                      disabled={isLoading}
+                      {...form.register("firstName")}
+                    />
+                    {form.formState.errors.firstName && (
+                      <p className="text-sm text-destructive">{form.formState.errors.firstName.message}</p>
+                    )}
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="lastName">Last name</Label>
+                    <Input
+                      id="lastName"
+                      placeholder="Last name"
+                      disabled={isLoading}
+                      {...form.register("lastName")}
+                    />
+                    {form.formState.errors.lastName && (
+                      <p className="text-sm text-destructive">{form.formState.errors.lastName.message}</p>
+                    )}
+                  </div>
+                </div>
+                
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -112,16 +163,9 @@ export default function LoginPage() {
                     <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
                   )}
                 </div>
+                
                 <div className="grid gap-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link
-                      href="/reset-password"
-                      className="text-sm text-muted-foreground hover:text-primary"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
+                  <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
                     type="password"
@@ -132,25 +176,56 @@ export default function LoginPage() {
                     <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
                   )}
                 </div>
-                <Button disabled={isLoading}>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    disabled={isLoading}
+                    {...form.register("confirmPassword")}
+                  />
+                  {form.formState.errors.confirmPassword && (
+                    <p className="text-sm text-destructive">{form.formState.errors.confirmPassword.message}</p>
+                  )}
+                </div>
+                
+                <div className="flex items-center space-x-2 my-2">
+                  <Checkbox 
+                    id="acceptTerms" 
+                    disabled={isLoading}
+                    {...form.register("acceptTerms")}
+                  />
+                  <Label htmlFor="acceptTerms" className="text-sm">
+                    I agree to the{" "}
+                    <Link href="/terms" className="underline underline-offset-4 hover:text-primary">
+                      terms and conditions
+                    </Link>
+                  </Label>
+                </div>
+                {form.formState.errors.acceptTerms && (
+                  <p className="text-sm text-destructive -mt-2">{form.formState.errors.acceptTerms.message}</p>
+                )}
+                
+                <Button disabled={isLoading} className="mt-2">
                   {isLoading && (
                     <svg className="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                     </svg>
                   )}
-                  Sign In
+                  Create account
                 </Button>
               </div>
             </form>
           </div>
 
           <p className="px-8 text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
+            Already have an account?{" "}
             <Link
-              href="/register"
+              href="/login"
               className="underline underline-offset-4 hover:text-primary"
             >
-              Sign up
+              Sign in
             </Link>
           </p>
         </div>
