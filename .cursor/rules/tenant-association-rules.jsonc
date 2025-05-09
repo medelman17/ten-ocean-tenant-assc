@@ -1,0 +1,169 @@
+{
+  "name": "10 Ocean Tenant Association Rules",
+  "description": "Coding standards and practices for the 10 Ocean Tenant Association application",
+  "rules": [
+    {
+      "name": "Follow Next.js App Router Patterns",
+      "description": "Ensure all routing code follows Next.js 15 App Router conventions",
+      "pattern": {
+        "locations": ["app/**/*.tsx", "app/**/*.ts"],
+        "advices": [
+          "Use 'page.tsx' for route pages and 'layout.tsx' for route layouts",
+          "Use 'loading.tsx' for loading states and 'error.tsx' for error states",
+          "Implement server components where possible for data fetching",
+          "Use client components only when client-side interactivity is required",
+          "Use React suspense boundaries for asynchronous data loading",
+          "Type params and searchParams with Promise types in page props"
+        ]
+      }
+    },
+    {
+      "name": "Supabase Authentication Practices",
+      "description": "Ensure correct usage of Supabase Auth",
+      "pattern": {
+        "locations": ["app/**/*.ts", "app/**/*.tsx", "lib/supabase/**/*.ts"],
+        "advices": [
+          "Always use '@supabase/ssr' package, NEVER '@supabase/auth-helpers-nextjs'",
+          "Always use 'getAll' and 'setAll' for cookie handling, NEVER 'get', 'set', or 'remove'",
+          "Use the established patterns from '/lib/supabase/client.ts' and '/lib/supabase/server.ts'",
+          "Prefer server-side authentication checks over client-side whenever possible",
+          "Remember to revalidate paths after authentication state changes"
+        ]
+      }
+    },
+    {
+      "name": "Database Interaction Patterns",
+      "description": "Ensure consistent database access patterns",
+      "pattern": {
+        "locations": ["lib/services/**/*.ts", "app/**/*.ts", "app/**/actions.ts"],
+        "advices": [
+          "Use snake_case for database fields and camelCase for application code",
+          "Use transformation utilities in 'lib/utils/case-transforms.ts' for conversions",
+          "Implement repository pattern with service layers for database access",
+          "Secure database operations with Supabase RLS policies",
+          "Handle database errors gracefully with appropriate user feedback",
+          "Prefer server actions for database mutations over client API calls"
+        ]
+      }
+    },
+    {
+      "name": "Type Safety Requirements",
+      "description": "Enforce strong type safety throughout the application",
+      "pattern": {
+        "locations": ["**/*.ts", "**/*.tsx"],
+        "advices": [
+          "Use generated Supabase types from 'types/supabase.ts'",
+          "Define explicit interfaces for component props",
+          "Avoid 'any' type - use 'unknown' with type guards when necessary",
+          "Use zod for server-side data validation",
+          "Create domain-specific type definitions in appropriate modules",
+          "Use discriminated unions for state management"
+        ]
+      }
+    },
+    {
+      "name": "UI Component Standards",
+      "description": "Enforce consistent UI component development",
+      "pattern": {
+        "locations": ["components/**/*.tsx", "app/**/components/**/*.tsx"],
+        "advices": [
+          "Use shadcn/ui components as the foundation for UI elements",
+          "Style only with Tailwind classes, no CSS files or inline styles",
+          "Ensure components are accessible with proper ARIA attributes",
+          "Use 'cn()' utility for conditional class names",
+          "Implement responsive designs for all UI components",
+          "Add 'use client' directive only when component requires client-side interactivity"
+        ]
+      }
+    },
+    {
+      "name": "Database Schema Migrations",
+      "description": "Guidelines for database schema changes",
+      "pattern": {
+        "locations": ["supabase/**/*.sql"],
+        "advices": [
+          "Define schema changes in SQL files in 'supabase/schemas/' directory",
+          "Generate migrations with 'npx supabase db diff -f <migration_name>'",
+          "Don't directly modify files in 'supabase/migrations/'",
+          "Regenerate TypeScript types after schema changes",
+          "When writing database functions, use 'SECURITY INVOKER' and set 'search_path = '''"
+        ]
+      }
+    },
+    {
+      "name": "Security Best Practices",
+      "description": "Ensure application security",
+      "pattern": {
+        "locations": ["**/*.tsx", "**/*.ts"],
+        "advices": [
+          "Never expose sensitive information in client components",
+          "Implement proper data validation for all user inputs",
+          "Use Row Level Security (RLS) policies for database access control",
+          "Never store sensitive data in localStorage or sessionStorage",
+          "Implement proper CSRF protection for forms",
+          "Validate and sanitize all user inputs to prevent injection attacks"
+        ]
+      }
+    },
+    {
+      "name": "File Management and Organization",
+      "description": "File structure and naming conventions",
+      "pattern": {
+        "locations": ["**/*"],
+        "advices": [
+          "Use kebab-case for file naming",
+          "Keep files under 300 lines of code",
+          "No TODOs or placeholders in production code",
+          "Place route-specific components in the corresponding route directory",
+          "Place shared components in the components directory",
+          "Group related files together by feature"
+        ]
+      }
+    },
+    {
+      "name": "Form Handling Patterns",
+      "description": "Guidelines for form implementation",
+      "pattern": {
+        "locations": ["app/**/actions.ts", "app/**/*.tsx", "components/**/*.tsx"],
+        "advices": [
+          "Use React Hook Form with zod for form validation",
+          "Implement server actions for form submissions",
+          "Provide clear error messages for validation failures",
+          "Use controlled components for complex form interactions",
+          "Implement proper form accessibility with labels and ARIA attributes",
+          "Handle form submission states (loading, success, error) appropriately"
+        ]
+      }
+    },
+    {
+      "name": "State Management",
+      "description": "Guidelines for state management",
+      "pattern": {
+        "locations": ["app/**/*.tsx", "components/**/*.tsx"],
+        "advices": [
+          "Use React state for simple component-level state",
+          "Use React Context for shared state that spans multiple components",
+          "Prefer server components for data fetching to minimize client-side state",
+          "Use React Query for client-side data fetching and caching",
+          "Implement proper loading and error states",
+          "Use reducers for complex state transitions"
+        ]
+      }
+    },
+    {
+      "name": "Tenant Association Domain Logic",
+      "description": "Guidelines for implementing tenant association business logic",
+      "pattern": {
+        "locations": ["lib/services/**/*.ts"],
+        "advices": [
+          "Implement user verification flow with admin/floor captain approval",
+          "Handle alumni membership transitions properly",
+          "Enforce proper access control for different user roles",
+          "Implement notification system for community events and announcements",
+          "Manage file attachments with proper access control",
+          "Implement maintenance request workflow with status transitions"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "name": "10 Ocean Tenant Association Database Access",
+  "description": "Rules for database access patterns and data handling",
+  "rules": [
+    {
+      "name": "Supabase Client Usage",
+      "description": "Standards for Supabase client initialization and usage",
+      "pattern": {
+        "locations": ["**/*.ts", "**/*.tsx"],
+        "advices": [
+          "Use createClient() from lib/supabase/server.ts for server components",
+          "Use createClient() from lib/supabase/client.ts for client components",
+          "Never initialize Supabase client directly with createClient from @supabase/supabase-js",
+          "Always pass the full Supabase URL and anon key from environment variables",
+          "Handle cookie management correctly with getAll and setAll",
+          "Remember that server client is asynchronous and requires await"
+        ]
+      }
+    },
+    {
+      "name": "Data Transformation",
+      "description": "Rules for transforming data between database and application",
+      "pattern": {
+        "locations": ["lib/services/**/*.ts", "app/**/actions.ts"],
+        "advices": [
+          "Use toCamelCase() from lib/utils/case-transforms.ts for database → app conversions",
+          "Use toSnakeCase() from lib/utils/case-transforms.ts for app → database conversions",
+          "Apply transformations consistently at the boundary of database operations",
+          "Handle nested objects and arrays appropriately in transformations",
+          "Document any exceptions to the transformation rules",
+          "Consider creating domain-specific transformation functions for complex objects"
+        ]
+      }
+    },
+    {
+      "name": "Query Construction",
+      "description": "Guidelines for building database queries",
+      "pattern": {
+        "locations": ["lib/services/**/*.ts", "app/**/actions.ts"],
+        "advices": [
+          "Build complex queries step by step for readability",
+          "Use select() with explicit columns when not fetching all columns",
+          "Use .match() for exact matches and .ilike() for case-insensitive partial matches",
+          "Be mindful of query performance and avoid N+1 query problems",
+          "Use proper pagination with .range() or .limit()/offset()",
+          "Add appropriate order by clauses for consistent results"
+        ]
+      }
+    },
+    {
+      "name": "Error Handling",
+      "description": "Standards for handling database errors",
+      "pattern": {
+        "locations": ["lib/services/**/*.ts", "app/**/actions.ts"],
+        "advices": [
+          "Always check for errors in Supabase responses",
+          "Provide meaningful error messages for different error scenarios",
+          "Handle connection errors gracefully",
+          "Consider retry logic for transient failures",
+          "Log detailed error information for debugging",
+          "Return appropriate HTTP status codes for API responses"
+        ]
+      }
+    },
+    {
+      "name": "Data Validation",
+      "description": "Guidelines for validating data before database operations",
+      "pattern": {
+        "locations": ["lib/services/**/*.ts", "app/**/actions.ts"],
+        "advices": [
+          "Use zod schemas to validate data before database operations",
+          "Validate input data at the application boundary",
+          "Define reusable validation schemas for common data structures",
+          "Provide clear error messages for validation failures",
+          "Consider using database constraints as a second layer of validation",
+          "Handle validation errors gracefully with user feedback"
+        ]
+      }
+    },
+    {
+      "name": "Transaction Handling",
+      "description": "Guidelines for database transactions",
+      "pattern": {
+        "locations": ["lib/services/**/*.ts"],
+        "advices": [
+          "Use transactions for operations that must succeed or fail together",
+          "Implement proper error handling and rollback in transactions",
+          "Keep transactions as short as possible",
+          "Be aware of isolation levels and their implications",
+          "Document transaction boundaries and requirements",
+          "Consider using the rpc() method for stored procedures with transactions"
+        ]
+      }
+    },
+    {
+      "name": "Relationship Loading",
+      "description": "Guidelines for loading related data",
+      "pattern": {
+        "locations": ["lib/services/**/*.ts", "app/**/actions.ts"],
+        "advices": [
+          "Use select() with nested syntax for joining related tables",
+          "Be explicit about which columns to fetch from related tables",
+          "Consider using multiple queries for complex relationships",
+          "Be mindful of the depth of joins to avoid performance issues",
+          "Use aliases for ambiguous column names",
+          "Consider implementing lazy loading for infrequently accessed relationships"
+        ]
+      }
+    },
+    {
+      "name": "Caching Strategy",
+      "description": "Guidelines for database query caching",
+      "pattern": {
+        "locations": ["lib/services/**/*.ts", "app/**/actions.ts"],
+        "advices": [
+          "Use appropriate caching headers for read-only data",
+          "Implement cache invalidation for frequently updated data",
+          "Consider using React Query for client-side caching and invalidation",
+          "Be mindful of cache staleness and implement appropriate TTLs",
+          "Document caching decisions and requirements",
+          "Consider using Redis for complex caching scenarios"
+        ]
+      }
+    },
+    {
+      "name": "Database Types",
+      "description": "Guidelines for working with Supabase-generated types",
+      "pattern": {
+        "locations": ["**/*.ts", "**/*.tsx"],
+        "advices": [
+          "Import types from types/supabase.ts",
+          "Use Tables<'table_name'> for row data types",
+          "Use TablesInsert<'table_name'> for insert types",
+          "Use TablesUpdate<'table_name'> for update types",
+          "Create domain-specific interfaces that extend the generated types",
+          "Keep Supabase-generated types up-to-date after schema changes"
+        ]
+      }
+    },
+    {
+      "name": "Security Considerations",
+      "description": "Security guidelines for database access",
+      "pattern": {
+        "locations": ["**/*.ts", "**/*.tsx", "supabase/migrations/*.sql"],
+        "advices": [
+          "Rely on Row Level Security (RLS) policies for access control",
+          "Never bypass RLS with service_role unless absolutely necessary",
+          "Validate all user inputs before database operations",
+          "Be mindful of SQL injection vectors in dynamic queries",
+          "Use parameterized queries for dynamic conditions",
+          "Never expose sensitive data unnecessarily",
+          "Review and test RLS policies regularly"
+        ]
+      }
+    }
+  ]
+}
