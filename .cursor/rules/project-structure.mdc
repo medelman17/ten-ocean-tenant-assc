@@ -1,0 +1,98 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Structure Guidelines
+
+Follow these guidelines when creating new files to maintain consistent project organization.
+
+## Directory Structure
+
+```
+├── app/                    # Next.js app router pages and API routes
+│   ├── api/               # API routes
+│   ├── actions/           # Server actions (public)
+│   ├── [route]/          # Route directories
+│   │   ├── page.tsx      # Page component
+│   │   ├── layout.tsx    # Layout component
+│   │   └── components/   # Route-specific components
+├── components/            # Shared UI components
+│   ├── ui/               # Basic UI components
+│   └── [feature]/        # Feature-specific components
+├── supabase/                # Supabase schema, functions, and backend logic
+├── lib/                   # Utility functions and services
+│   ├── services/         # Business logic and data services (Supabase client wrappers)
+│   ├── validations/      # Form and data validation
+│   ├── supabase/           # Convex client configuration and utilities
+│   └── config/           # Configuration files
+├── types/                # TypeScript type definitions
+└── public/              # Static assets
+
+```
+
+## File Location Guidelines
+
+1. **Components**
+   - Reusable UI components → `/components/ui/`
+   - Feature-specific shared components → `/components/[feature]/`
+   - Route-specific components → `/app/[route]/components/`
+
+2. **Business Logic**
+   - Supabase backend logic → `/supabase/`
+   - Database services (Supabase client wrappers) → `/lib/services/`
+   - Utility functions → `/lib/utils.ts`
+   - Type definitions → `/types/`
+   - Form validation → `/lib/validations/`
+   - Convex client config → `/lib/supabase/`
+
+3. **Server Actions**
+   - Server actions → `/app/actions/`
+
+4. **API Routes**
+   - All API routes → `/app/api/`
+
+## Naming Conventions
+
+1. **Files**
+   - React components and Utilities: kebab-case (e.g., `auth-utils.ts`)
+   - Pages: `page.tsx`
+   - Layouts: `layout.tsx`
+   - Server actions: kebab-case (e.g., `create-sponsor.ts`)
+   - Supabase functions: kebab-case (e.g., `record-visit.ts`)
+
+2. **Directories**
+   - Route directories: kebab-case
+   - Component directories: kebab-case
+   - Feature directories: kebab-case
+   - Supabase modules: kebab-case
+
+## File Sizes
+
+Prefer to keep files to 300 lines of code. Split larger components into separate imports.
+
+## Examples
+
+### Good: New Component Location
+```typescript
+// ✅ /components/sponsors/sponsor-card.tsx
+export function SponsorCard() { ... }
+
+// ✅ /app/sponsors/[slug]/components/tier-selector.tsx
+export function TierSelector() { ... }
+```
+
+### Good: New Service Location
+```typescript
+// ✅ /lib/services/visit-service.ts
+export async function recordVisit(args) { ... }
+
+// ✅ /lib/validations/sponsor-schema.ts
+export const sponsorSchema = { ... }
+```
+
+### Good: New Server Action Location
+```typescript
+// ✅ /app/actions/create-sponsor.ts
+export async function createSponsor() { ... }
+```
