@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server"
 import { Icons } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
 import { UserRoleWithName } from "@/lib/types/db"
+import { RoleProvider } from "@/lib/components/role-provider"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -70,6 +71,12 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
       title: "Directory",
       href: "/dashboard/directory",
       icon: <Icons.users className="h-4 w-4" />,
+      variant: "ghost" as const
+    },
+    {
+      title: "Protected Example",
+      href: "/dashboard/protected-example",
+      icon: <Icons.lock className="h-4 w-4" />,
       variant: "ghost" as const
     },
   ]
@@ -181,7 +188,9 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
             </div>
           </div>
         </aside>
-        <main className="flex-1">{children}</main>
+        <main className="flex-1">
+          <RoleProvider>{children}</RoleProvider>
+        </main>
       </div>
     </div>
   )

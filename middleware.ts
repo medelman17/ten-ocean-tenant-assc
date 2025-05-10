@@ -1,11 +1,24 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { updateSession } from "@/lib/supabase/middleware"
+import { adminOnly, floorCaptainOnly } from "@/lib/supabase/auth-middleware"
 
 export async function middleware(request: NextRequest) {
   // Skip authentication check for the home route
   if (request.nextUrl.pathname === "/") {
     return NextResponse.next()
   }
+
+  // Admin-only routes
+  if (request.nextUrl.pathname.startsWith("/dashboard/admin")) {
+    return await adminOnly(request)
+  }
+
+  // Floor captain routes
+  if (request.nextUrl.pathname.startsWith("/dashboard/captain")) {
+    return await floorCaptainOnly(request)
+  }
+
+  // Default session check for all other routes
   return await updateSession(request)
 }
 

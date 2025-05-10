@@ -183,7 +183,7 @@ This project makes use of the following Message Control Protocol (MCP) servers:
                 "-y",
                 "@supabase/mcp-server-supabase@latest",
                 "--access-token",
-                "sbp_6712a68682f33274898a1e79e2a7f0feb27e9f80"
+                "YOUR_SUPABASE_ACCESS_TOKEN_HERE"
             ]
         },
         "memory": {
