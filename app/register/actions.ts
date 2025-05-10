@@ -14,7 +14,13 @@ export async function register(formData: FormData) {
   const confirmPassword = formData.get("confirmPassword") as string
   const firstName = formData.get("firstName") as string
   const lastName = formData.get("lastName") as string
-  const acceptTerms = formData.get("acceptTerms") === "on" || formData.get("acceptTerms") === "true"
+
+  // Fix for checkbox value: accept any truthy value including "on", "true"
+  const acceptTermsValue = formData.get("acceptTerms")
+  const acceptTerms = acceptTermsValue === "on" ||
+                     acceptTermsValue === "true" ||
+                     acceptTermsValue === "1" ||
+                     acceptTermsValue === "yes"
 
   // Validate form data
   try {
