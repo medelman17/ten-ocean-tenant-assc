@@ -15,12 +15,15 @@ export async function register(formData: FormData) {
   const firstName = formData.get("firstName") as string
   const lastName = formData.get("lastName") as string
 
-  // Fix for checkbox value: accept any truthy value including "on", "true"
+  // Log actual checkbox value for debugging
   const acceptTermsValue = formData.get("acceptTerms")
-  const acceptTerms = acceptTermsValue === "on" ||
-                     acceptTermsValue === "true" ||
-                     acceptTermsValue === "1" ||
-                     acceptTermsValue === "yes"
+  console.log("Received acceptTerms value:", acceptTermsValue)
+  console.log("Type of acceptTerms value:", typeof acceptTermsValue)
+
+  // Always force to a boolean value based on presence/truthy value
+  const acceptTerms = !!acceptTermsValue &&
+                    acceptTermsValue !== "false" &&
+                    acceptTermsValue !== "0"
 
   // Validate form data
   try {

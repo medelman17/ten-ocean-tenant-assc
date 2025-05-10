@@ -36,6 +36,9 @@ export default function RegisterPage() {
     setError(null)
     setSuccess(null)
 
+    // Log the value for debugging
+    console.log("Form value for acceptTerms:", data.acceptTerms)
+
     try {
       const formData = new FormData()
       formData.append("email", data.email)
@@ -44,8 +47,10 @@ export default function RegisterPage() {
       formData.append("firstName", data.firstName)
       formData.append("lastName", data.lastName)
 
-      // Explicitly set the value to "true" string when checked
-      formData.append("acceptTerms", data.acceptTerms ? "true" : "false")
+      // Debug: Try a direct approach with an HTML checkbox value
+      if (data.acceptTerms === true) {
+        formData.append("acceptTerms", "on")
+      }
 
       const result = await register(formData)
 
@@ -192,10 +197,13 @@ export default function RegisterPage() {
                 </div>
                 
                 <div className="flex items-center space-x-2 my-2">
-                  <Checkbox 
-                    id="acceptTerms" 
+                  <Checkbox
+                    id="acceptTerms"
                     disabled={isLoading}
-                    {...form.register("acceptTerms")}
+                    checked={form.watch("acceptTerms")}
+                    onCheckedChange={(checked) => {
+                      form.setValue("acceptTerms", checked === true);
+                    }}
                   />
                   <Label htmlFor="acceptTerms" className="text-sm">
                     I agree to the{" "}
