@@ -8,6 +8,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Skip authentication for Inngest webhook routes
+  if (request.nextUrl.pathname.startsWith("/api/inngest")) {
+    return NextResponse.next()
+  }
+
   // Admin-only routes
   if (request.nextUrl.pathname.startsWith("/dashboard/admin")) {
     return await adminOnly(request)
