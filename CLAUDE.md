@@ -53,6 +53,23 @@ npx supabase db diff -f <migration_name>
 npx supabase db push
 ```
 
+### Database Environment Script
+
+The project includes a helper script for managing database operations with proper environment variables:
+
+```bash
+# Push migrations to the database (uses environment variables)
+pnpm db:push
+
+# Pull the current database schema (uses environment variables)
+pnpm db:pull
+
+# Generate TypeScript types from the current schema
+pnpm db:types
+```
+
+This script loads environment variables from `.env.local` and `.env` files and sets up the correct database password for Supabase CLI operations. Use these commands instead of direct `npx supabase` commands for production or staging environments.
+
 ## Project Structure
 
 The project follows a specific directory structure:
@@ -236,10 +253,20 @@ The application uses Next.js server actions for forms and data mutations:
    - Use fully qualified names for database objects
    - Minimize side effects
 
-3. Row-Level Security (RLS):
+3. Managing database credentials:
+   - Store your database password in `.env.local` as `POSTGRES_PASSWORD`
+   - Use the `pnpm db:*` commands which handle credential management
+   - Never hardcode database credentials in scripts or migrations
+   - For local development, use `supabase start` which sets up local credentials automatically
+
+4. Row-Level Security (RLS):
    - Define policies for each table
    - Use role-based permissions
    - Ensure proper filtering by user ID
+   - Important tables with RLS policies:
+     - `user_profiles`: Controls who can view, create, and update user profiles
+     - `roles`: Controls who can assign and view roles
+     - `permissions`: Controls who can modify permission settings
 
 ### UI Components
 
