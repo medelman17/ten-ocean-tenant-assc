@@ -4,7 +4,10 @@
 import { Database } from "@/types/supabase"
 
 // Database row types
-export type UserProfile = Database["public"]["Tables"]["user_profiles"]["Row"]
+export type UserProfile = Database["public"]["Tables"]["user_profiles"]["Row"] & {
+  email?: string; // Add email from Auth
+}
+
 export type Unit = Database["public"]["Tables"]["units"]["Row"]
 export type Role = Database["public"]["Tables"]["roles"]["Row"]
 export type UserRole = Database["public"]["Tables"]["user_roles"]["Row"] & {
@@ -17,6 +20,7 @@ export type FloorCaptainAssignment = Database["public"]["Tables"]["floor_captain
 // Define UserProfileWithUnit type for joins
 export type UserProfileWithUnit = UserProfile & {
   units?: Unit | null
+  email?: string; // Add email from Auth
 }
 
 // Define RoleWithName type for joins
@@ -26,4 +30,18 @@ export type UserRoleWithName = {
   roles: {
     name: string
   }
+}
+
+// Type for floor captain user object
+export type FloorCaptainInfo = {
+  user_id: string
+  email: string
+  name: string
+}
+
+// Type for approver list
+export type UserApproverInfo = {
+  userId: string
+  email: string
+  name: string
 }
