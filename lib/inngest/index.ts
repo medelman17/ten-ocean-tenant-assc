@@ -11,9 +11,29 @@ export type { Events } from "./events"
 
 // Export all available functions
 export * from "./functions/user-verification"
+export * from "./functions/email-notifications"
 
 // Helper functions for sending events
 import { inngest } from "./client"
+
+/**
+ * Send an email notification event
+ */
+export async function sendEmailNotification(data: {
+  to: string
+  subject?: string
+  template: string
+  templateData: Record<string, unknown>
+}) {
+  return inngest.send({
+    name: "notification/email.send",
+    data: {
+      ...data,
+      subject: data.subject || "", // Will be overridden by template if not provided
+      timestamp: new Date().toISOString()
+    }
+  })
+}
 
 /**
  * Send a user registration event to trigger the verification workflow
