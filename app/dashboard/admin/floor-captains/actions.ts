@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { withRoleAuth } from "@/lib/supabase/auth-middleware"
 import { Roles } from "@/lib/types/roles"
-import { toCamelCase, toSnakeCase } from "@/lib/utils/case-transforms"
+import { toCamelCase } from "@/lib/utils/case-transforms"
 import { revalidatePath } from "next/cache"
 
 export interface FloorCaptainAssignment {
@@ -25,7 +25,7 @@ export interface FloorCaptainAssignment {
  */
 export async function fetchFloorCaptainAssignments(): Promise<FloorCaptainAssignment[]> {
   // Ensure the user is an admin
-  const { user } = await withRoleAuth([Roles.Admin])
+  await withRoleAuth([Roles.Admin])
   
   const supabase = await createClient()
   
@@ -57,7 +57,7 @@ export async function fetchFloorCaptainAssignments(): Promise<FloorCaptainAssign
   // Transform data to camelCase and format user details
   return data.map(assignment => {
     // Basic assignment data transformation
-    const camelCaseAssignment = toCamelCase(assignment) as any
+    const camelCaseAssignment = toCamelCase(assignment) as Record<string, unknown>
     
     // Extract user data if available
     let user = undefined

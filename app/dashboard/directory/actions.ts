@@ -5,7 +5,6 @@ import { withRoleAuth } from "@/lib/supabase/auth-middleware"
 import { Roles } from "@/lib/types/roles"
 import { ResidentProfile } from "@/lib/types/directory"
 import { toCamelCase } from "@/lib/utils/case-transforms"
-import { revalidatePath } from "next/cache"
 
 /**
  * Fetch all verified residents for the building directory
@@ -13,7 +12,7 @@ import { revalidatePath } from "next/cache"
  */
 export async function fetchVerifiedResidents(): Promise<ResidentProfile[]> {
   // Verify user is authenticated and has appropriate role
-  const { user, profile } = await withRoleAuth([Roles.Resident, Roles.Admin, Roles.FloorCaptain])
+  const { profile } = await withRoleAuth([Roles.Resident, Roles.Admin, Roles.FloorCaptain])
   
   // Check if user is verified
   if (profile?.verification_status !== 'approved') {
@@ -62,7 +61,7 @@ export async function fetchVerifiedResidents(): Promise<ResidentProfile[]> {
   // Transform data to camelCase and format for our components
   const formattedResidents = data.map(resident => {
     // Convert snake_case to camelCase for all fields
-    const camelCaseResident = toCamelCase(resident) as any
+    const camelCaseResident = toCamelCase(resident) as Record<string, unknown>
     
     // Extract and format user skills
     const userSkills = resident.user_skills?.[0] || null
@@ -96,7 +95,7 @@ export async function fetchVerifiedResidents(): Promise<ResidentProfile[]> {
  */
 export async function fetchAvailableFloors(): Promise<number[]> {
   // Verify user is authenticated and has appropriate role
-  const { user, profile } = await withRoleAuth([Roles.Resident, Roles.Admin, Roles.FloorCaptain])
+  const { profile } = await withRoleAuth([Roles.Resident, Roles.Admin, Roles.FloorCaptain])
   
   // Check if user is verified
   if (profile?.verification_status !== 'approved') {

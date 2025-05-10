@@ -14,7 +14,7 @@ export const metadata = {
 
 export default async function FloorCaptainDashboard() {
   // Verify user is authenticated and has FloorCaptain role
-  const { user } = await withRoleAuth([Roles.FloorCaptain, Roles.Admin])
+  await withRoleAuth([Roles.FloorCaptain, Roles.Admin])
   
   // Fetch floors assigned to this floor captain
   const assignedFloors = await fetchAssignedFloors()

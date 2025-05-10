@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React from 'react';
 import { render, screen, waitFor } from '@/lib/utils/test-utils';
 import LoginPage from '@/app/login/page';

@@ -4,7 +4,7 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 
-// Mock ResizeObserver which isn't available in the test environment
+// Mock browser APIs that aren't available in the test environment
 class ResizeObserverMock {
   observe() {}
   unobserve() {}
@@ -12,6 +12,29 @@ class ResizeObserverMock {
 }
 
 global.ResizeObserver = ResizeObserverMock;
+
+// Mock FormData if not available
+if (typeof global.FormData === 'undefined') {
+  global.FormData = function FormData() {
+    this.data = new Map();
+
+    this.append = function(key, value) {
+      this.data.set(key, value);
+    };
+
+    this.get = function(key) {
+      return this.data.get(key);
+    };
+
+    this.has = function(key) {
+      return this.data.has(key);
+    };
+
+    this.getAll = function(key) {
+      return this.data.has(key) ? [this.data.get(key)] : [];
+    };
+  };
+}
 
 // Mock the next/navigation hooks
 jest.mock('next/navigation', () => ({

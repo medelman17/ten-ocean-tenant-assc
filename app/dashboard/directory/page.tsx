@@ -15,7 +15,7 @@ export const metadata = {
 
 export default async function DirectoryPage() {
   // Verify user is authenticated and has appropriate role
-  const { user, profile } = await withRoleAuth([Roles.Resident, Roles.Admin, Roles.FloorCaptain])
+  const { profile } = await withRoleAuth([Roles.Resident, Roles.Admin, Roles.FloorCaptain])
 
   // Check if user is verified, if not redirect to dashboard
   if (profile?.verification_status !== 'approved') {

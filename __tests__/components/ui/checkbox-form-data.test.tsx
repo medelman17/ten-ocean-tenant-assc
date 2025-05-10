@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React, { FormEvent } from 'react';
 import { render, screen } from '@/lib/utils/test-utils';
 import { Checkbox } from '@/components/ui/checkbox';

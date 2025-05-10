@@ -182,7 +182,7 @@ export async function fetchFloorResidents(floorNumber: number): Promise<Resident
   // Transform data to camelCase and format for our components
   const formattedResidents = residents.map(resident => {
     // Convert snake_case to camelCase for all fields
-    const camelCaseResident = toCamelCase(resident) as any
+    const camelCaseResident = toCamelCase(resident) as Record<string, unknown>
     
     // Extract and format user skills
     const userSkills = resident.user_skills?.[0] || null

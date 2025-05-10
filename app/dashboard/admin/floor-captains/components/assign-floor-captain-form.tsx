@@ -2,13 +2,12 @@
 
 import { useState } from "react"
 import { FloorCaptainAssignment, assignFloorCaptain } from "../actions"
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Icons } from "@/components/ui/icons"
@@ -16,9 +15,7 @@ import { toast } from "sonner"
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"

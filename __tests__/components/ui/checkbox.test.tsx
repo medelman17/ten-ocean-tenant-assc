@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React from 'react';
 import { render, screen } from '@/lib/utils/test-utils';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -56,11 +60,11 @@ describe('Checkbox Component', () => {
   it('can be checked and unchecked', async () => {
     const { user } = render(<Checkbox />);
     const checkbox = screen.getByRole('checkbox');
-    
+
     // Check the checkbox
     await user.click(checkbox);
     expect(checkbox).toBeChecked();
-    
+
     // Uncheck the checkbox
     await user.click(checkbox);
     expect(checkbox).not.toBeChecked();
@@ -69,10 +73,10 @@ describe('Checkbox Component', () => {
   it('calls onCheckedChange when clicked', async () => {
     const onCheckedChange = jest.fn();
     const { user } = render(<Checkbox onCheckedChange={onCheckedChange} />);
-    
+
     await user.click(screen.getByRole('checkbox'));
     expect(onCheckedChange).toHaveBeenCalledWith(true);
-    
+
     await user.click(screen.getByRole('checkbox'));
     expect(onCheckedChange).toHaveBeenCalledWith(false);
   });
@@ -80,22 +84,22 @@ describe('Checkbox Component', () => {
   it('can be disabled', async () => {
     const onCheckedChange = jest.fn();
     const { user } = render(<Checkbox disabled onCheckedChange={onCheckedChange} />);
-    
+
     await user.click(screen.getByRole('checkbox'));
     expect(onCheckedChange).not.toHaveBeenCalled();
   });
 
   it('works with react-hook-form', async () => {
     const { user } = render(<TestForm />);
-    
+
     // Try to submit the form without checking the checkbox
     await user.click(screen.getByRole('button', { name: /submit/i }));
     expect(screen.getByRole('alert')).toHaveTextContent('You must accept the terms');
-    
+
     // Check the checkbox and submit
     await user.click(screen.getByRole('checkbox'));
     await user.click(screen.getByRole('button', { name: /submit/i }));
-    
+
     // Error message should be gone
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });

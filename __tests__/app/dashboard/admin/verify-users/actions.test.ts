@@ -1,3 +1,9 @@
+/**
+ * @jest-environment jsdom
+ *
+ * This test requires the jsdom environment for FormData
+ */
+
 import { approveUser, rejectUser } from '@/app/dashboard/admin/verify-users/actions';
 import { createClient } from '@/lib/supabase/server';
 import { inngest } from '@/lib/inngest/client';
@@ -17,6 +23,23 @@ jest.mock('@/lib/inngest/client', () => ({
 jest.mock('next/cache', () => ({
   revalidatePath: jest.fn(),
 }));
+
+// Jest needs global FormData for these tests to work
+global.FormData = class FormData {
+  private data: Record<string, string> = {};
+
+  append(key: string, value: string) {
+    this.data[key] = value;
+  }
+
+  get(key: string) {
+    return this.data[key];
+  }
+
+  has(key: string) {
+    return key in this.data;
+  }
+};
 
 describe('User Verification Actions', () => {
   let mockFormData: FormData;
