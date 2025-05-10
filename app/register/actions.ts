@@ -74,12 +74,16 @@ export async function register(formData: FormData) {
 
   // Trigger user registration workflow via Inngest
   try {
-    const { sendUserRegisteredEvent } = await import("@/lib/inngest")
-    await sendUserRegisteredEvent({
-      userId: data.user?.id || "",
-      email,
-      firstName,
-      lastName
+    const { inngest } = await import("@/lib/inngest/client")
+    await inngest.send({
+      name: "user/registered",
+      data: {
+        userId: data.user?.id || "",
+        email,
+        firstName,
+        lastName,
+        createdAt: new Date().toISOString()
+      }
     })
   } catch (error) {
     console.error("Failed to trigger verification workflow:", error)

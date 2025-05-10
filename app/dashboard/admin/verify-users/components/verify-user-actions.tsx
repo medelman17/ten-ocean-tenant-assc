@@ -7,11 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Icons } from "@/components/ui/icons"
-import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 
-// Import Inngest functions
-import { sendUserVerifiedEvent, sendUserRejectedEvent } from "@/lib/inngest/index"
+// Import server actions
+import { approveUser, rejectUser } from "../actions"
 
 interface VerifyUserActionsProps {
   userId: string
@@ -23,30 +22,20 @@ export default function VerifyUserActions({ userId }: VerifyUserActionsProps) {
   const [isRejectOpen, setIsRejectOpen] = useState(false)
   const [notes, setNotes] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  
-  const handleApprove = async () => {
+
+  async function handleApprove(formData: FormData) {
     setIsLoading(true)
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) {
-        throw new Error("You must be logged in to approve users")
+      // Use the server action to approve the user
+      const result = await approveUser(formData)
+
+      if (result.success) {
+        toast.success(result.message || "User approved successfully")
+        setIsApproveOpen(false)
+        router.refresh()
+      } else {
+        toast.error(result.error || "Failed to approve user")
       }
-      
-      // We don't need to update the verification status here
-      // since the Inngest workflow will do that
-      
-      // Trigger the user verification workflow
-      await sendUserVerifiedEvent({
-        userId,
-        verifiedBy: user.id,
-        notes: notes.trim() || undefined
-      })
-      
-      toast.success("User approved successfully")
-      setIsApproveOpen(false)
-      router.refresh()
     } catch (error) {
       console.error("Error approving user:", error)
       toast.error("Failed to approve user")
@@ -54,30 +43,20 @@ export default function VerifyUserActions({ userId }: VerifyUserActionsProps) {
       setIsLoading(false)
     }
   }
-  
-  const handleReject = async () => {
+
+  async function handleReject(formData: FormData) {
     setIsLoading(true)
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) {
-        throw new Error("You must be logged in to reject users")
+      // Use the server action to reject the user
+      const result = await rejectUser(formData)
+
+      if (result.success) {
+        toast.success(result.message || "User rejected successfully")
+        setIsRejectOpen(false)
+        router.refresh()
+      } else {
+        toast.error(result.error || "Failed to reject user")
       }
-      
-      // We don't need to update the verification status here
-      // since the Inngest workflow will do that
-      
-      // Trigger the user rejection workflow
-      await sendUserRejectedEvent({
-        userId,
-        rejectedBy: user.id,
-        reason: notes.trim() || undefined
-      })
-      
-      toast.success("User rejected successfully")
-      setIsRejectOpen(false)
-      router.refresh()
     } catch (error) {
       console.error("Error rejecting user:", error)
       toast.error("Failed to reject user")
@@ -103,27 +82,32 @@ export default function VerifyUserActions({ userId }: VerifyUserActionsProps) {
               Are you sure you want to approve this user? They will receive an email notification.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <label className="block text-sm font-medium mb-2">Notes (Optional)</label>
-            <Textarea 
-              placeholder="Add any notes about this verification..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="min-h-[100px]"
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsApproveOpen(false)} disabled={isLoading}>
-              Cancel
-            </Button>
-            <Button onClick={handleApprove} disabled={isLoading}>
-              {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-              Confirm Approval
-            </Button>
-          </DialogFooter>
+          <form action={handleApprove}>
+            <input type="hidden" name="userId" value={userId} />
+
+            <div className="py-4">
+              <label className="block text-sm font-medium mb-2">Notes (Optional)</label>
+              <Textarea
+                name="notes"
+                placeholder="Add any notes about this verification..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsApproveOpen(false)} disabled={isLoading}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
+                Confirm Approval
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
-      
+
       {/* Reject Dialog */}
       <Dialog open={isRejectOpen} onOpenChange={setIsRejectOpen}>
         <DialogTrigger asChild>
@@ -139,24 +123,29 @@ export default function VerifyUserActions({ userId }: VerifyUserActionsProps) {
               Are you sure you want to reject this user? They will receive an email notification.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <label className="block text-sm font-medium mb-2">Rejection Reason (Optional)</label>
-            <Textarea 
-              placeholder="Explain why this user is being rejected..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="min-h-[100px]"
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsRejectOpen(false)} disabled={isLoading}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleReject} disabled={isLoading}>
-              {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-              Confirm Rejection
-            </Button>
-          </DialogFooter>
+          <form action={handleReject}>
+            <input type="hidden" name="userId" value={userId} />
+
+            <div className="py-4">
+              <label className="block text-sm font-medium mb-2">Rejection Reason (Optional)</label>
+              <Textarea
+                name="reason"
+                placeholder="Explain why this user is being rejected..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="min-h-[100px]"
+              />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsRejectOpen(false)} disabled={isLoading}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="destructive" disabled={isLoading}>
+                {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
+                Confirm Rejection
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

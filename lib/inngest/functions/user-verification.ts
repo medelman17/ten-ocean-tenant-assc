@@ -1,5 +1,5 @@
 import { inngest } from "../client"
-import { createClient } from "@/lib/supabase/server"
+import { createServiceClient } from "@/lib/supabase/service-client"
 import { UserApproverInfo } from "@/lib/types/db"
 
 /**
@@ -22,7 +22,7 @@ export const userVerificationWorkflow = inngest.createFunction(
     // Step 1: Update user profile with pending verification status
     // (This is a safety check as this should already be done during registration)
     await step.run("ensure-pending-verification", async () => {
-      const supabase = await createClient()
+      const supabase = createServiceClient()
       
       const { data, error } = await supabase
         .from("user_profiles")
@@ -42,7 +42,7 @@ export const userVerificationWorkflow = inngest.createFunction(
     // If a unit is provided, we'll find the floor captain for that floor
     // Otherwise, we'll notify all admins
     const notifyList = await step.run("find-approvers", async () => {
-      const supabase = await createClient()
+      const supabase = createServiceClient()
       
       // If we have a unit, get its floor to find the floor captain
       if (unitId) {
@@ -186,11 +186,11 @@ export const userApprovalWorkflow = inngest.createFunction(
     
     // Step 1: Update user profile with approved status
     const updatedProfile = await step.run("update-verification-status", async () => {
-      const supabase = await createClient()
-      
+      const supabase = createServiceClient()
+
       const { data, error } = await supabase
         .from("user_profiles")
-        .update({ 
+        .update({
           verification_status: "approved",
           verified_by: verifiedBy,
           verified_at: timestamp,
@@ -200,29 +200,45 @@ export const userApprovalWorkflow = inngest.createFunction(
         .select(`
           first_name,
           last_name,
-          email,
           display_name
         `)
         .single()
-        
+
       if (error) {
         throw new Error(`Failed to update user verification status: ${error.message}`)
       }
-      
-      return data
+
+      // Use a safe type for the profile data
+      return data as {
+        first_name?: string;
+        last_name?: string;
+        display_name?: string;
+      } | null
     })
     
     // Step 2: Notify the user of their approval
     await step.run("notify-user", async () => {
+      const supabase = createServiceClient()
+
+      // Get user email from auth
+      const { data: userData } = await supabase.auth.admin.getUserById(userId)
+      const userEmail = userData?.user?.email || ""
+
+      if (!userEmail) {
+        console.error("Could not find user email for notification")
+        return { notified: false }
+      }
+
       // Send an email to the user
       await inngest.send({
         name: "notification/email.send",
         data: {
-          to: updatedProfile.email,
+          to: userEmail,
           subject: "Your Account Has Been Verified",
           template: "user-verification-approved",
           templateData: {
-            userName: updatedProfile.display_name || `${updatedProfile.first_name} ${updatedProfile.last_name}`,
+            userName: updatedProfile?.display_name ||
+                     `${updatedProfile?.first_name || ""} ${updatedProfile?.last_name || ""}`,
             loginLink: `${process.env.NEXT_PUBLIC_SITE_URL}/login`
           },
           timestamp: new Date().toISOString()
@@ -260,11 +276,11 @@ export const userRejectionWorkflow = inngest.createFunction(
     
     // Step 1: Update user profile with rejected status
     const updatedProfile = await step.run("update-verification-status", async () => {
-      const supabase = await createClient()
-      
+      const supabase = createServiceClient()
+
       const { data, error } = await supabase
         .from("user_profiles")
-        .update({ 
+        .update({
           verification_status: "rejected",
           verified_by: rejectedBy,
           verified_at: timestamp,
@@ -274,29 +290,45 @@ export const userRejectionWorkflow = inngest.createFunction(
         .select(`
           first_name,
           last_name,
-          email,
           display_name
         `)
         .single()
-        
+
       if (error) {
         throw new Error(`Failed to update user verification status: ${error.message}`)
       }
-      
-      return data
+
+      // Use a safe type for the profile data
+      return data as {
+        first_name?: string;
+        last_name?: string;
+        display_name?: string;
+      } | null
     })
     
     // Step 2: Notify the user of their rejection
     await step.run("notify-user", async () => {
+      const supabase = createServiceClient()
+
+      // Get user email from auth
+      const { data: userData } = await supabase.auth.admin.getUserById(userId)
+      const userEmail = userData?.user?.email || ""
+
+      if (!userEmail) {
+        console.error("Could not find user email for notification")
+        return { notified: false }
+      }
+
       // Send an email to the user
       await inngest.send({
         name: "notification/email.send",
         data: {
-          to: updatedProfile.email,
+          to: userEmail,
           subject: "Account Verification Status",
           template: "user-verification-rejected",
           templateData: {
-            userName: updatedProfile.display_name || `${updatedProfile.first_name} ${updatedProfile.last_name}`,
+            userName: updatedProfile?.display_name ||
+                     `${updatedProfile?.first_name || ""} ${updatedProfile?.last_name || ""}`,
             reason: reason || "Your account verification was declined by the administrator.",
             contactEmail: process.env.SUPPORT_EMAIL || "management@example.com"
           },
