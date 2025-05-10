@@ -75,6 +75,20 @@ export async function register(formData: FormData) {
     }
   }
 
+  // Trigger user registration workflow via Inngest
+  try {
+    const { sendUserRegisteredEvent } = await import("@/lib/inngest")
+    await sendUserRegisteredEvent({
+      userId: data.user?.id || "",
+      email,
+      firstName,
+      lastName
+    })
+  } catch (error) {
+    console.error("Failed to trigger verification workflow:", error)
+    // Don't fail registration if Inngest event fails, but log it
+  }
+
   return { 
     success: true, 
     message: "Registration successful! Please check your email to confirm your account." 

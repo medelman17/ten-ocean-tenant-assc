@@ -2,14 +2,12 @@
 
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-import { cookies } from "next/headers"
 import { z } from "zod"
 
 import { createClient } from "@/lib/supabase/server"
 import { loginSchema } from "@/lib/validations/auth"
 
 export async function login(formData: FormData) {
-  const cookieStore = cookies()
   const supabase = await createClient()
 
   // Extract data from form
@@ -28,16 +26,16 @@ export async function login(formData: FormData) {
   }
 
   // Attempt to sign in
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { error: signInError } = await supabase.auth.signInWithPassword({
     email,
     password,
   })
 
-  if (error) {
+  if (signInError) {
     // Return the error to the client rather than redirecting
     return {
       success: false,
-      error: error.message || "Authentication failed"
+      error: signInError.message || "Authentication failed"
     }
   }
 

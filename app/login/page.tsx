@@ -8,7 +8,6 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Icons } from "@/components/ui/icons"
 import { LoginFormValues, loginSchema } from "@/lib/validations/auth"
 import { login } from "./actions"
 
@@ -70,7 +69,7 @@ export default function LoginPage() {
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-lg">
-              "Building a stronger community through connection, communication, and collaboration."
+              &quot;Building a stronger community through connection, communication, and collaboration.&quot;
             </p>
             <footer className="text-sm">10 Ocean Tenant Association</footer>
           </blockquote>
@@ -145,7 +144,7 @@ export default function LoginPage() {
           </div>
 
           <p className="px-8 text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/register"
               className="underline underline-offset-4 hover:text-primary"
