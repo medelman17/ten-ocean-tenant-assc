@@ -89,7 +89,21 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
       icon: <Icons.userPlus className="h-4 w-4" />,
       variant: "ghost" as const
     },
+    ...(isFloorCaptain ? [
+      {
+        title: "Floor Captain",
+        href: "/dashboard/floor-captain",
+        icon: <Icons.building className="h-4 w-4" />,
+        variant: "ghost" as const
+      }
+    ] : []),
     ...(isAdmin ? [
+      {
+        title: "Floor Captains",
+        href: "/dashboard/admin/floor-captains",
+        icon: <Icons.users className="h-4 w-4" />,
+        variant: "ghost" as const
+      },
       {
         title: "Management",
         href: "/dashboard/admin",
