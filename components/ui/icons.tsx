@@ -7,6 +7,7 @@ import {
   ChevronsUpDown,
   Home,
   Loader2,
+  Lock,
   LogOut,
   Mail,
   MessageSquare,
@@ -43,6 +44,7 @@ export type IconKeys =
   | "document"
   | "notification"
   | "warning"
+  | "lock"
 
 export const Icons = {
   logo: Building,
@@ -65,4 +67,5 @@ export const Icons = {
   document: FileText,
   notification: Bell,
   warning: AlertCircle,
+  lock: Lock,
 }

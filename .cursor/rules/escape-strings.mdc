@@ -1,0 +1,20 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+// @name Fix Unescaped Apostrophes in JSX
+// @description Replace unescaped apostrophes (') with &apos; in JSX/TSX files to fix react/no-unescaped-entities errors
+// @filePattern **/*.tsx,**/*.jsx
+// @match /('[^']+')/g
+
+const replacement = (match, p1) => {
+  // Replace only the apostrophes that are causing the issue
+  // We're looking for apostrophes within JSX text content
+  return p1.replace(/'/g, "&apos;");
+};
+
+return code.replace(/([''])([^''"]*?)([''])/g, (match, openQuote, content, closeQuote) => {
+  // Only replace apostrophes within the content, not the quotes themselves
+  return openQuote + content.replace(/'/g, "&apos;") + closeQuote;
+});

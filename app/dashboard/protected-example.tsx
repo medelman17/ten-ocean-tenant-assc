@@ -108,7 +108,7 @@ export default withRole(ProtectedExample, {
     <Card className="mt-4">
       <CardHeader>
         <CardTitle>Access Denied</CardTitle>
-        <CardDescription>You don't have permission to view this page</CardDescription>
+        <CardDescription>You don&apos;t have permission to view this page</CardDescription>
       </CardHeader>
       <CardContent>
         <p>Please contact an administrator if you believe you should have access.</p>
