@@ -176,19 +176,21 @@ export default function RegisterPage() {
                     id="password"
                     type="password"
                     disabled={isLoading}
+                    data-testid="password-field"
                     {...form.register("password")}
                   />
                   {form.formState.errors.password && (
                     <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
                   )}
                 </div>
-                
+
                 <div className="grid gap-2">
                   <Label htmlFor="confirmPassword">Confirm Password</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
                     disabled={isLoading}
+                    data-testid="confirm-password-field"
                     {...form.register("confirmPassword")}
                   />
                   {form.formState.errors.confirmPassword && (
