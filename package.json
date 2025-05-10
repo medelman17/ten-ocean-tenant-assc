@@ -11,7 +11,9 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "prepare": "husky",
-    "pre-push": "pnpm test"
+    "pre-push": "pnpm test",
+    "db:push": "node scripts/supabase-env.js db push",
+    "db:pull": "node scripts/supabase-env.js db pull"
   },
   "dependencies": {
     "@hookform/resolvers": "5.0.1",
@@ -76,6 +78,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "16.5.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "eslint-plugin-react-hooks": "5.2.0",
