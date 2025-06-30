@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { updateSession } from "@/lib/supabase/middleware"
-import { adminOnly, floorCaptainOnly } from "@/lib/supabase/auth-middleware"
+import { authMiddleware } from "@/lib/auth/middleware"
 
 export async function middleware(request: NextRequest) {
   // Skip authentication check for the home route
@@ -13,18 +12,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Admin-only routes
-  if (request.nextUrl.pathname.startsWith("/dashboard/admin")) {
-    return await adminOnly(request)
+  // Skip authentication for auth-related API routes
+  if (request.nextUrl.pathname.startsWith("/api/auth")) {
+    return NextResponse.next()
   }
 
-  // Floor captain routes
-  if (request.nextUrl.pathname.startsWith("/dashboard/captain")) {
-    return await floorCaptainOnly(request)
+  // Skip authentication for public API routes (if any)
+  if (request.nextUrl.pathname.startsWith("/api/public")) {
+    return NextResponse.next()
   }
 
-  // Default session check for all other routes
-  return await updateSession(request)
+  // Use our new authentication middleware for all other routes
+  return await authMiddleware(request)
 }
 
 export const config = {
