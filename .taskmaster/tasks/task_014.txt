@@ -1,0 +1,20 @@
+# Task ID: 14
+# Title: Enhance document sharing with updated privacy controls
+# Status: pending
+# Dependencies: 6, 10
+# Priority: medium
+# Description: Migrate document sharing functionality to use Cloudflare R2 and implement enhanced privacy controls.
+# Details:
+1. Update file upload and storage to use Cloudflare R2
+2. Implement fine-grained access control for documents
+3. Create Prisma models for document metadata and permissions
+4. Implement versioning for documents
+5. Create a user interface for managing document permissions
+6. Implement secure document preview functionality
+7. Add audit logging for document access and changes
+
+# Test Strategy:
+1. Test document upload, download, and deletion
+2. Verify access control based on user roles and permissions
+3. Test document versioning and history
+4. Validate audit logging accuracy

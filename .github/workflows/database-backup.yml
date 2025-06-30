@@ -1,0 +1,112 @@
+name: Database Backup
+
+on:
+  schedule:
+    # Run daily at 2:00 AM UTC (during low usage)
+    - cron: "0 2 * * *"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  backup:
+    name: Backup Neon PostgreSQL Database
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Create backup
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
+        run: |
+          # Create timestamp for backup file
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          BACKUP_FILE="ten-ocean-backup-${TIMESTAMP}.sql"
+
+          # Create database backup using pg_dump
+          pg_dump "${DATABASE_URL}" \
+            --verbose \
+            --clean \
+            --if-exists \
+            --no-owner \
+            --no-privileges \
+            --format=plain \
+            --file="${BACKUP_FILE}"
+
+          # Compress and encrypt backup
+          gzip "${BACKUP_FILE}"
+
+          # Verify backup file was created and has content
+          if [ -f "${BACKUP_FILE}.gz" ] && [ -s "${BACKUP_FILE}.gz" ]; then
+            echo "✅ Backup created successfully: ${BACKUP_FILE}.gz"
+            ls -lah "${BACKUP_FILE}.gz"
+          else
+            echo "❌ Backup failed!"
+            exit 1
+          fi
+
+      - name: Upload backup to secure storage
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          S3_BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+        run: |
+          # Install AWS CLI
+          pip install awscli
+
+          # Upload to S3 with encryption
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          BACKUP_FILE="ten-ocean-backup-${TIMESTAMP}.sql.gz"
+
+          aws s3 cp "${BACKUP_FILE}" \
+            "s3://${S3_BUCKET}/database-backups/$(date +%Y/%m)/${BACKUP_FILE}" \
+            --server-side-encryption AES256 \
+            --storage-class STANDARD_IA
+
+          echo "✅ Backup uploaded to S3 successfully"
+
+      - name: Cleanup local backup files
+        run: |
+          # Remove local backup files for security
+          rm -f *.sql.gz
+          echo "✅ Local backup files cleaned up"
+
+      - name: Backup retention cleanup
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          S3_BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+        run: |
+          # Remove backups older than 30 days
+          CUTOFF_DATE=$(date -d "30 days ago" +%Y-%m-%d)
+
+          echo "🗂️ Cleaning up backups older than ${CUTOFF_DATE}"
+
+          # List and delete old backups
+          aws s3 ls "s3://${S3_BUCKET}/database-backups/" --recursive | \
+          while read -r line; do
+            backup_date=$(echo $line | awk '{print $1}')
+            backup_file=$(echo $line | awk '{print $4}')
+            
+            if [[ "$backup_date" < "$CUTOFF_DATE" ]]; then
+              echo "Deleting old backup: $backup_file"
+              aws s3 rm "s3://${S3_BUCKET}/${backup_file}"
+            fi
+          done
+
+          echo "✅ Backup retention cleanup completed"
+
+      - name: Send notification on failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"❌ Database backup failed for Ten Ocean project. Please check the GitHub Actions logs."}' \
+            "$SLACK_WEBHOOK"

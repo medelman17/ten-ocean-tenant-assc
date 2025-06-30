@@ -1,0 +1,20 @@
+# Task ID: 2
+# Title: Migrate database schema from Supabase to Prisma
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Convert the existing Supabase schema to Prisma schema definition, preserving all relationships, indexes, and constraints.
+# Details:
+1. Export current Supabase schema
+2. Use `prisma db pull` to generate initial Prisma schema
+3. Manually review and adjust the schema to ensure all relationships are correct
+4. Add any custom PostgreSQL functions and triggers
+5. Implement row-level security policies using Prisma middleware
+6. Generate and test database migrations: `npx prisma migrate dev`
+7. Use Prisma Studio to visually inspect the schema: `npx prisma studio`
+
+# Test Strategy:
+1. Compare Prisma schema with original Supabase schema
+2. Verify all tables, relationships, and constraints are present
+3. Test custom PostgreSQL functions and triggers
+4. Validate row-level security policies

@@ -1,0 +1,20 @@
+# Task ID: 5
+# Title: Migrate authentication system to Auth.js (NextAuth)
+# Status: pending
+# Dependencies: 4
+# Priority: high
+# Description: Replace Supabase Auth with Auth.js for authentication and session management.
+# Details:
+1. Install Auth.js: `npm install next-auth@latest`
+2. Configure Auth.js with Prisma adapter: `npm install @next-auth/prisma-adapter`
+3. Set up Auth.js API routes and configuration
+4. Implement custom sign-in, sign-up, and session handling
+5. Migrate existing user data to Auth.js compatible format
+6. Update middleware for new auth system
+7. Implement role-based access control using Auth.js session
+
+# Test Strategy:
+1. Test all authentication flows (sign-up, sign-in, sign-out)
+2. Verify session persistence and management
+3. Test role-based access control
+4. Validate secure password hashing and storage

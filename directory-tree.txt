@@ -1,0 +1,253 @@
+ten-ocean-tenant-assc/
+├── .taskmaster/
+│   ├── config.json
+│   ├── docs/
+│   │   └── prd.txt
+│   ├── reports/
+│   ├── state.json
+│   ├── tasks/
+│   │   ├── tasks.json
+│   │   ├── task-01.md
+│   │   ├── task-02.md
+│   │   ├── task-03.md
+│   │   ├── task-04.md
+│   │   ├── task-05.md
+│   │   ├── task-06.md
+│   │   ├── task-07.md
+│   │   ├── task-08.md
+│   │   ├── task-09.md
+│   │   ├── task-10.md
+│   │   ├── task-11.md
+│   │   ├── task-12.md
+│   │   ├── task-13.md
+│   │   ├── task-14.md
+│   │   ├── task-15.md
+│   │   ├── task-16.md
+│   │   ├── task-17.md
+│   │   └── task-18.md
+│   └── templates/
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       ├── database-backup.yml
+│       └── deploy.yml
+├── __tests__/
+│   ├── app/
+│   │   ├── login/
+│   │   │   └── login-page.test.tsx
+│   │   └── register/
+│   │       └── register-page.test.tsx
+│   ├── components/
+│   │   └── ui/
+│   │       ├── checkbox-form-data.test.tsx
+│   │       └── checkbox.test.tsx
+│   ├── lib/
+│   │   └── inngest/
+│   │       └── functions/
+│   │           └── user-verification.test.ts
+│   └── README.md
+├── app/
+│   ├── api/
+│   │   ├── auth/
+│   │   │   └── signout/
+│   │   │       └── route.ts
+│   │   └── inngest/
+│   │       └── route.ts
+│   ├── auth/
+│   │   └── confirm/
+│   │       └── route.ts
+│   ├── dashboard/
+│   │   ├── admin/
+│   │   │   ├── floor-captains/
+│   │   │   │   ├── actions.ts
+│   │   │   │   ├── components/
+│   │   │   │   │   ├── assign-floor-captain-form.tsx
+│   │   │   │   │   └── floor-captains-table.tsx
+│   │   │   │   └── page.tsx
+│   │   │   └── verify-users/
+│   │   │       ├── actions.ts
+│   │   │       ├── components/
+│   │   │       │   └── verify-user-actions.tsx
+│   │   │       └── page.tsx
+│   │   ├── directory/
+│   │   │   ├── actions.ts
+│   │   │   ├── components/
+│   │   │   │   ├── directory-filters.tsx
+│   │   │   │   ├── directory-list.tsx
+│   │   │   │   └── resident-modal.tsx
+│   │   │   └── page.tsx
+│   │   ├── floor-captain/
+│   │   │   ├── actions.ts
+│   │   │   ├── components/
+│   │   │   │   ├── floor-announcements.tsx
+│   │   │   │   ├── floor-info.tsx
+│   │   │   │   └── residents-list.tsx
+│   │   │   └── page.tsx
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── protected-example/
+│   │   │   └── page.tsx
+│   │   └── protected-example.tsx
+│   ├── error/
+│   │   └── page.tsx
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── login/
+│   │   ├── actions.ts
+│   │   └── page.tsx
+│   ├── page.tsx
+│   └── register/
+│       ├── actions.ts
+│       └── page.tsx
+├── CLAUDE.md
+├── components/
+│   └── ui/
+│       ├── accordion.tsx
+│       ├── alert-dialog.tsx
+│       ├── alert.tsx
+│       ├── aspect-ratio.tsx
+│       ├── avatar.tsx
+│       ├── badge.tsx
+│       ├── breadcrumb.tsx
+│       ├── button.tsx
+│       ├── calendar.tsx
+│       ├── card.tsx
+│       ├── carousel.tsx
+│       ├── chart.tsx
+│       ├── checkbox.tsx
+│       ├── collapsible.tsx
+│       ├── command.tsx
+│       ├── context-menu.tsx
+│       ├── dialog.tsx
+│       ├── drawer.tsx
+│       ├── dropdown-menu.tsx
+│       ├── form.tsx
+│       ├── hover-card.tsx
+│       ├── icons.tsx
+│       ├── input-otp.tsx
+│       ├── input.tsx
+│       ├── label.tsx
+│       ├── menubar.tsx
+│       ├── navigation-menu.tsx
+│       ├── pagination.tsx
+│       ├── popover.tsx
+│       ├── progress.tsx
+│       ├── radio-group.tsx
+│       ├── resizable.tsx
+│       ├── scroll-area.tsx
+│       ├── select.tsx
+│       ├── separator.tsx
+│       ├── sheet.tsx
+│       ├── sidebar.tsx
+│       ├── skeleton.tsx
+│       ├── slider.tsx
+│       ├── sonner.tsx
+│       ├── switch.tsx
+│       ├── table.tsx
+│       ├── tabs.tsx
+│       ├── textarea.tsx
+│       ├── toggle-group.tsx
+│       ├── toggle.tsx
+│       └── tooltip.tsx
+├── components.json
+├── docs/
+│   ├── database-monitoring.md
+│   ├── features/
+│   │   ├── building-directory.md
+│   │   ├── floor-captain.md
+│   │   └── testing-issues.md
+│   ├── inngest-architecture.md
+│   ├── memos/
+│   │   └── failing-tests-analysis.md
+│   ├── migration/
+│   │   ├── raw-schema-export.sql
+│   │   ├── schema-export.md
+│   │   ├── schema-inventory.json
+│   │   ├── schema-manual-adjustments.md
+│   │   ├── schema-adjustments-completion-report.md
+│   │   └── schema-validation-report.md
+│   ├── migration-prd.md
+│   ├── README.md
+│   ├── role-based-access-control.md
+│   ├── schema/
+│   │   ├── auth.md
+│   │   ├── data-models.md
+│   │   ├── entities/
+│   │   │   └── README.md
+│   │   ├── migrations.md
+│   │   ├── policies.md
+│   │   ├── queries.md
+│   │   └── README.md
+│   └── typescript-best-practices.md
+├── eslint.config.mjs
+├── hooks/
+│   ├── use-floors.ts
+│   ├── use-mobile.ts
+│   └── use-residents.ts
+├── jest.config.js
+├── jest.setup.js
+├── lib/
+│   ├── components/
+│   │   ├── role-provider.tsx
+│   │   └── with-role.tsx
+│   ├── config/
+│   ├── generated/
+│   │   └── prisma/
+│   │       ├── index.js
+│   │       ├── index.d.ts
+│   │       └── edge.js
+│   ├── inngest/
+│   │   ├── client.ts
+│   │   ├── events.ts
+│   │   ├── functions/
+│   │   │   ├── email-notifications.ts
+│   │   │   └── user-verification.ts
+│   │   └── index.ts
+│   ├── services/
+│   ├── supabase/
+│   │   ├── auth-middleware.ts
+│   │   ├── client.ts
+│   │   ├── middleware.ts
+│   │   ├── server-auth.ts
+│   │   ├── server.ts
+│   │   └── service-client.ts
+│   ├── types/
+│   │   ├── db.ts
+│   │   ├── directory.ts
+│   │   └── roles.ts
+│   ├── utils/
+│   │   ├── case-transforms.ts
+│   │   ├── roles.ts
+│   │   └── test-utils.tsx
+│   ├── utils.ts
+│   └── validations/
+│       └── auth.ts
+├── LICENSE
+├── middleware.ts
+├── next.config.ts
+├── package.json
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── postcss.config.mjs
+├── prisma/
+│   └── schema.prisma
+├── public/
+│   ├── apple-icon.png
+│   ├── favicon.ico
+│   └── icon.png
+├── README.md
+├── scripts/
+│   └── supabase-env.js
+├── supabase/
+│   ├── config.toml
+│   ├── migrations/
+│   │   ├── 20250509194100_remote_schema.sql
+│   │   ├── 20250509231818_tenant_association_schema.sql
+│   │   ├── 20250510032339_remote_schema.sql
+│   │   └── 20250510034434_verification_rls_policies.sql
+│   └── schemas/
+│       ├── tenant_association_schema.sql
+│       └── verification_rls_policies.sql
+├── tsconfig.json
+└── types/
+    └── supabase.ts 

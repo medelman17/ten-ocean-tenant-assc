@@ -1,0 +1,157 @@
+{
+	"meta": {
+		"generatedAt": "2025-06-30T15:10:38.708Z",
+		"tasksAnalyzed": 18,
+		"totalTasks": 18,
+		"analysisCount": 18,
+		"thresholdScore": 6,
+		"projectName": "Taskmaster",
+		"usedResearch": true
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "Set up Neon PostgreSQL instance and configure Prisma",
+			"complexityScore": 5,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Break down the setup of Neon PostgreSQL and Prisma configuration into granular steps, including account creation, database setup, Prisma installation, connection configuration, client installation, connection pooling, and backup/monitoring setup.",
+			"reasoning": "This task involves multiple distinct setup and configuration steps, each with its own verification requirements. While each step is standard, the combination increases overall complexity, especially with performance and monitoring considerations."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "Migrate database schema from Supabase to Prisma",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Expand the schema migration process into detailed subtasks, covering schema export, Prisma schema generation, manual adjustments, custom function migration, security policy implementation, migration testing, and schema validation.",
+			"reasoning": "Schema migration requires careful handling of relationships, constraints, and custom logic. Manual review and adaptation add to the complexity, as does ensuring parity between the old and new schemas."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Implement data migration scripts",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Detail the data migration process into subtasks for script development, batching, transaction management, timestamp preservation, data type handling, logging, error handling, rollback, and integrity verification.",
+			"reasoning": "Data migration is error-prone and must ensure integrity, handle large datasets, and support rollback. The need for custom handling of data types and robust error management increases complexity."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Replace Supabase client with Prisma client",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "List subtasks for installing Prisma, generating the client, building a new service layer, refactoring queries, handling relationships, implementing transactions, and updating error handling and logging.",
+			"reasoning": "Refactoring all database interactions to a new ORM impacts many code areas and requires careful testing to avoid regressions, especially for complex queries and error handling."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Migrate authentication system to Auth.js (NextAuth)",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Expand the authentication migration into subtasks for installing Auth.js, configuring adapters, setting up API routes, implementing custom flows, migrating user data, updating middleware, and adding role-based access control.",
+			"reasoning": "Authentication migration is critical and complex, involving sensitive data, integration with new systems, and ensuring secure, seamless user experiences."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Implement Cloudflare R2 for file storage",
+			"complexityScore": 6,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Break down the R2 migration into subtasks for account setup, SDK installation, credential configuration, service creation, API updates, privacy controls, and URL management.",
+			"reasoning": "File storage migration involves external services, API changes, and security considerations, but follows a relatively standard integration pattern."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "Migrate real-time features to Pusher",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Detail the real-time migration into subtasks for Pusher setup, SDK installation, credential configuration, server and client integration, event migration, and performance testing.",
+			"reasoning": "Real-time features require both backend and frontend changes, careful event mapping, and performance validation, increasing the complexity."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Update Inngest integration with Prisma",
+			"complexityScore": 6,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Expand the Inngest integration update into subtasks for event handler refactoring, workflow updates, notification system changes, scheduling, digest generation, error handling, and connection management.",
+			"reasoning": "Updating background job processing touches multiple workflows and requires careful management of database connections and error handling."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Implement connection pooling and query optimization",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "List subtasks for configuring pooling, setting up PgBouncer, optimizing queries, implementing data loader patterns, managing includes, adding caching, and indexing.",
+			"reasoning": "Performance optimization requires both configuration and code changes, with a need for benchmarking and validation under load."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Migrate and test role-based access control",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Break down RBAC migration into subtasks for role mapping, assignment, middleware creation, client updates, row-level security, admin interface, inheritance, and comprehensive testing.",
+			"reasoning": "RBAC is foundational for security and must be thoroughly migrated and tested across backend, middleware, and frontend layers."
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "Implement and test user verification workflows",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Expand user verification into subtasks for model creation, workflow implementation, API development, notification setup, admin interface updates, and error handling.",
+			"reasoning": "Verification workflows span multiple systems and require robust error handling and user/admin interfaces."
+		},
+		{
+			"taskId": 12,
+			"taskTitle": "Migrate and enhance community features",
+			"complexityScore": 8,
+			"recommendedSubtasks": 10,
+			"expansionPrompt": "Detail the community feature migration into subtasks for event management, forum updates, survey migration, real-time integration, RSVP updates, survey enhancements, and analytics.",
+			"reasoning": "Community features are multifaceted, involving several subsystems and requiring both migration and enhancement, increasing complexity."
+		},
+		{
+			"taskId": 13,
+			"taskTitle": "Update maintenance request system",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break down the maintenance system update into subtasks for model creation, CRUD operations, status tracking, real-time updates, dashboard creation, notification system, and analytics.",
+			"reasoning": "This system involves both backend and frontend changes, real-time updates, and analytics, requiring coordination across components."
+		},
+		{
+			"taskId": 14,
+			"taskTitle": "Enhance document sharing with updated privacy controls",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Expand document sharing enhancement into subtasks for R2 integration, access control, metadata modeling, versioning, UI updates, secure preview, and audit logging.",
+			"reasoning": "Document sharing with fine-grained privacy, versioning, and audit logging is complex and security-sensitive."
+		},
+		{
+			"taskId": 15,
+			"taskTitle": "Implement comprehensive testing suite",
+			"complexityScore": 9,
+			"recommendedSubtasks": 10,
+			"expansionPrompt": "List subtasks for setting up unit, integration, and E2E testing frameworks, writing tests for all layers, implementing performance tests, and configuring CI pipelines.",
+			"reasoning": "A comprehensive testing suite spans all code layers and requires significant setup, coverage, and automation."
+		},
+		{
+			"taskId": 16,
+			"taskTitle": "Implement monitoring and observability",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Break down monitoring setup into subtasks for APM integration, database tracking, distributed tracing, dashboard creation, alerting, log aggregation, and runbook development.",
+			"reasoning": "Monitoring and observability require integration of multiple tools, custom dashboards, and operational readiness."
+		},
+		{
+			"taskId": 17,
+			"taskTitle": "Perform security audit and penetration testing",
+			"complexityScore": 9,
+			"recommendedSubtasks": 10,
+			"expansionPrompt": "Expand the security audit into subtasks for authentication review, penetration testing, database audit, storage security, vulnerability scanning, manual testing, and remediation.",
+			"reasoning": "Security audits are critical, require specialized skills, and must cover all system aspects, including third-party reviews and remediation."
+		},
+		{
+			"taskId": 18,
+			"taskTitle": "Create migration documentation and conduct team training",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Detail documentation and training into subtasks for technical docs, API docs, developer guides, runbooks, lessons learned, training sessions, and feedback collection.",
+			"reasoning": "Comprehensive documentation and training are essential for knowledge transfer and operational readiness, involving multiple deliverables and validation steps."
+		}
+	]
+}

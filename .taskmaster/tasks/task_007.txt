@@ -1,0 +1,20 @@
+# Task ID: 7
+# Title: Migrate real-time features to Pusher
+# Status: pending
+# Dependencies: 4
+# Priority: medium
+# Description: Replace Supabase Realtime with Pusher for WebSocket communication and real-time updates.
+# Details:
+1. Set up Pusher account and create an app
+2. Install Pusher server SDK: `npm install pusher`
+3. Install Pusher client SDK: `npm install pusher-js`
+4. Configure Pusher credentials in environment variables
+5. Implement Pusher service for server-side event publishing
+6. Update client-side code to subscribe to Pusher channels
+7. Migrate forum real-time updates and event notifications
+
+# Test Strategy:
+1. Test real-time updates for forum posts
+2. Verify event notification functionality
+3. Measure latency of real-time updates
+4. Test scalability with multiple concurrent connections

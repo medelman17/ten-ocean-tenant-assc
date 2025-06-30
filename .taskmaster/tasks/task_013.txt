@@ -1,0 +1,20 @@
+# Task ID: 13
+# Title: Update maintenance request system
+# Status: pending
+# Dependencies: 4, 7
+# Priority: medium
+# Description: Migrate the maintenance request tracking system to use Prisma and implement real-time status updates.
+# Details:
+1. Create Prisma models for maintenance requests
+2. Implement CRUD operations for maintenance requests using Prisma
+3. Update status tracking and history logging
+4. Implement real-time status updates using Pusher
+5. Create dashboard for maintenance staff
+6. Implement notification system for request updates
+7. Add reporting and analytics features
+
+# Test Strategy:
+1. Test maintenance request creation and updating
+2. Verify real-time status updates
+3. Validate notification delivery for status changes
+4. Test reporting and analytics functionality

@@ -1,0 +1,21 @@
+# Task ID: 8
+# Title: Update Inngest integration with Prisma
+# Status: pending
+# Dependencies: 4
+# Priority: medium
+# Description: Modify background job processing to use Prisma client for database operations.
+# Details:
+1. Update Inngest event handlers to use Prisma client
+2. Refactor user verification workflows
+3. Update email notification system to use Prisma for data fetching
+4. Modify event reminder scheduling to use Prisma queries
+5. Update digest generation for community updates
+6. Implement proper error handling and retries
+7. Ensure Prisma connections are properly managed in Inngest functions
+
+# Test Strategy:
+1. Test all Inngest workflows with Prisma integration
+2. Verify user verification process
+3. Test email notification generation
+4. Validate event reminder functionality
+5. Check digest generation accuracy

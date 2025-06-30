@@ -1,0 +1,776 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ================================================================
+// ENUMS FOR TYPE SAFETY
+// ================================================================
+
+enum ResidencyStatus {
+  CURRENT     @map("current")
+  FORMER      @map("former") 
+  PROSPECTIVE @map("prospective")
+}
+
+enum VerificationStatus {
+  PENDING  @map("pending")
+  VERIFIED @map("verified")
+  REJECTED @map("rejected")
+}
+
+enum MaintenancePriority {
+  LOW    @map("low")
+  MEDIUM @map("medium")
+  HIGH   @map("high")
+  URGENT @map("urgent")
+}
+
+enum MaintenanceStatus {
+  PENDING     @map("pending")
+  IN_PROGRESS @map("in_progress")
+  COMPLETED   @map("completed")
+  CANCELLED   @map("cancelled")
+}
+
+enum EventAttendeeStatus {
+  GOING     @map("going")
+  MAYBE     @map("maybe")
+  NOT_GOING @map("not_going")
+}
+
+enum AnnouncementPriority {
+  LOW    @map("low")
+  NORMAL @map("normal")
+  HIGH   @map("high")
+  URGENT @map("urgent")
+}
+
+enum TopicStatus {
+  OPEN     @map("open")
+  CLOSED   @map("closed")
+  ARCHIVED @map("archived")
+}
+
+enum ConnectionStatus {
+  PENDING  @map("pending")
+  ACCEPTED @map("accepted")
+  BLOCKED  @map("blocked")
+}
+
+// ================================================================
+// CORE USER & AUTHENTICATION MODELS
+// ================================================================
+
+model UserProfile {
+  id                       String             @id @default(uuid()) @db.Uuid
+  firstName                String?            @map("first_name")
+  lastName                 String?            @map("last_name")
+  displayName              String?            @map("display_name")
+  bio                      String?
+  phone                    String?
+  profilePictureUrl        String?            @map("profile_picture_url")
+  profileVisibility        String?            @map("profile_visibility") // 'public', 'residents', 'private'
+  profileCompleteness      Int?               @map("profile_completeness") @db.SmallInt
+  
+  // Residency Information
+  unitId                   String?            @map("unit_id") @db.Uuid
+  residencyStatus          ResidencyStatus?   @map("residency_status")
+  moveInDate               DateTime?          @map("move_in_date")
+  moveOutDate              DateTime?          @map("move_out_date")
+  
+  // Emergency Contact
+  emergencyContactName     String?            @map("emergency_contact_name")
+  emergencyContactPhone    String?            @map("emergency_contact_phone")
+  
+  // Alumni Information
+  alumniSince              DateTime?          @map("alumni_since")
+  forwardingAddress        String?            @map("forwarding_address")
+  
+  // Additional Information
+  occupation               String?
+  languagesSpoken          String[]           @map("languages_spoken")
+  petInformation           Json?              @map("pet_information")
+  socialMediaLinks         Json?              @map("social_media_links")
+  
+  // Verification
+  verificationStatus       VerificationStatus? @map("verification_status")
+  verificationNotes        String?            @map("verification_notes")
+  verifiedAt               DateTime?          @map("verified_at")
+  verifiedBy               String?            @map("verified_by") @db.Uuid
+  
+  // Timestamps
+  createdAt                DateTime           @default(now()) @map("created_at")
+  updatedAt                DateTime           @updatedAt @map("updated_at")
+
+  // Relations
+  unit                     Unit?              @relation(fields: [unitId], references: [id])
+  
+  // User-created content
+  announcements            Announcement[]     @relation("AnnouncementCreator")
+  events                   Event[]            @relation("EventCreator")
+  eventAttendances         EventAttendee[]
+  forumCategories          ForumCategory[]    @relation("CategoryCreator")
+  forumTopics              ForumTopic[]       @relation("TopicAuthor")
+  forumPosts               ForumPost[]        @relation("PostAuthor")
+  topicSubscriptions       TopicSubscription[]
+  categorySubscriptions    CategorySubscription[]
+  postReactions            PostReaction[]
+  comments                 Comment[]
+  files                    File[]             @relation("FileUploader")
+  fileAttachments          FileAttachment[]   @relation("AttachmentAdder")
+  documents                Document[]         @relation("DocumentUploader")
+  maintenanceReports       MaintenanceRequest[] @relation("MaintenanceReporter")
+  maintenanceAssignments   MaintenanceRequest[] @relation("MaintenanceAssignee")
+  chatSessions             ChatSession[]
+  chatMessages             ChatMessage[]
+  surveys                  Survey[]           @relation("SurveyCreator")
+  surveyResponses          SurveyResponse[]
+  userConnections          UserConnection[]   @relation("UserConnectionOwner")
+  connectedUsers           UserConnection[]   @relation("ConnectedUser")
+  
+  // Assignments and roles
+  userRoles                UserRole[]
+  floorCaptainAssignments  FloorCaptainAssignment[]
+  userMemberships          UserMembership[]
+  userPreferences          UserPreferences?
+  userSkills               UserSkills?
+  
+  @@map("user_profiles")
+  @@index([residencyStatus], name: "idx_user_profiles_residency_status")
+  @@index([unitId], name: "idx_user_profiles_unit_id")
+  @@index([verificationStatus], name: "idx_user_profiles_verification_status")
+  @@index([residencyStatus, unitId], name: "idx_user_profiles_residency_unit")
+  @@index([verificationStatus, createdAt], name: "idx_user_profiles_verification_created")
+}
+
+model UserPreferences {
+  userId                   String    @id @unique @map("user_id") @db.Uuid
+  notificationSettings     Json?     @map("notification_settings")
+  communicationPreferences Json?     @map("communication_preferences")
+  privacySettings          Json?     @map("privacy_settings")
+  accessibilitySettings    Json?     @map("accessibility_settings")
+  themePreference          String?   @map("theme_preference") // 'light', 'dark', 'auto'
+  emailDigestFrequency     String?   @map("email_digest_frequency") // 'daily', 'weekly', 'never'
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user                     UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("user_preferences")
+}
+
+model UserSkills {
+  id                       String    @id @default(uuid()) @db.Uuid
+  userId                   String    @unique @map("user_id") @db.Uuid
+  skills                   String[]
+  interests                String[]
+  communityInvolvement     String[]  @map("community_involvement")
+  volunteerAvailability    Json?     @map("volunteer_availability")
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user                     UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("user_skills")
+}
+
+// ================================================================
+// ROLE & PERMISSION MODELS
+// ================================================================
+
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  description String?
+  permissions Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  userRoles        UserRole[]
+  forumCategories  ForumCategory[] @relation("CategoryRequiredRole")
+
+  @@map("roles")
+}
+
+model UserRole {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  roleId     String    @map("role_id") @db.Uuid
+  assignedBy String?   @map("assigned_by") @db.Uuid
+  assignedAt DateTime  @default(now()) @map("assigned_at")
+
+  // Relations
+  user UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+model FloorCaptainAssignment {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  floorNumber Int       @map("floor_number")
+  assignedBy  String?   @map("assigned_by") @db.Uuid
+  assignedAt  DateTime  @default(now()) @map("assigned_at")
+
+  // Relations
+  user UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, floorNumber])
+  @@map("floor_captain_assignments")
+}
+
+// ================================================================
+// BUILDING & UNIT MODELS
+// ================================================================
+
+model Unit {
+  id            String    @id @default(uuid()) @db.Uuid
+  unitNumber    String    @unique @map("unit_number")
+  floor         Int       @db.SmallInt
+  bedrooms      Int?      @db.SmallInt
+  bathrooms     Int?      @db.SmallInt
+  squareFootage Int?      @map("square_footage")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  residents           UserProfile[]      @relation()
+  maintenanceRequests MaintenanceRequest[]
+
+  @@map("units")
+}
+
+// ================================================================
+// COMMUNICATION MODELS
+// ================================================================
+
+model Announcement {
+  id          String               @id @default(uuid()) @db.Uuid
+  title       String
+  content     String
+  priority    AnnouncementPriority @default(NORMAL)
+  isPinned    Boolean              @default(false) @map("is_pinned")
+  publishedAt DateTime?            @map("published_at")
+  expiresAt   DateTime?            @map("expires_at")
+  createdBy   String               @map("created_by") @db.Uuid
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @updatedAt @map("updated_at")
+
+  // Relations
+  creator UserProfile @relation("AnnouncementCreator", fields: [createdBy], references: [id])
+
+  @@map("announcements")
+  @@index([priority, publishedAt], name: "idx_announcements_priority_published")
+  @@index([createdBy, createdAt], name: "idx_announcements_creator_created")
+}
+
+model ForumCategory {
+  id                String    @id @default(uuid()) @db.Uuid
+  name              String
+  description       String?
+  slug              String    @unique
+  isPrivate         Boolean   @default(false) @map("is_private")
+  displayOrder      Int       @default(0) @map("display_order")
+  iconFileId        String?   @map("icon_file_id") @db.Uuid
+  parentCategoryId  String?   @map("parent_category_id") @db.Uuid
+  requiredRoleId    String?   @map("required_role_id") @db.Uuid
+  createdBy         String    @map("created_by") @db.Uuid
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  creator           UserProfile         @relation("CategoryCreator", fields: [createdBy], references: [id])
+  iconFile          File?               @relation("CategoryIcon", fields: [iconFileId], references: [id])
+  parentCategory    ForumCategory?      @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id], onDelete: SetNull)
+  childCategories   ForumCategory[]     @relation("CategoryHierarchy")
+  requiredRole      Role?               @relation("CategoryRequiredRole", fields: [requiredRoleId], references: [id])
+  topics            ForumTopic[]
+  subscriptions     CategorySubscription[]
+
+  @@map("forum_categories")
+  @@index([parentCategoryId, displayOrder], name: "idx_forum_categories_parent_order")
+}
+
+model ForumTopic {
+  id           String      @id @default(uuid()) @db.Uuid
+  title        String
+  slug         String
+  status       TopicStatus @default(OPEN)
+  isPinned     Boolean     @default(false) @map("is_pinned")
+  isLocked     Boolean     @default(false) @map("is_locked")
+  isAnonymous  Boolean     @default(false) @map("is_anonymous")
+  viewCount    Int         @default(0) @map("view_count")
+  lastPostAt   DateTime    @default(now()) @map("last_post_at")
+  categoryId   String      @map("category_id") @db.Uuid
+  authorId     String      @map("author_id") @db.Uuid
+  createdAt    DateTime    @default(now()) @map("created_at")
+
+  // Relations
+  category      ForumCategory       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  author        UserProfile         @relation("TopicAuthor", fields: [authorId], references: [id])
+  posts         ForumPost[]
+  subscriptions TopicSubscription[]
+
+  @@unique([categoryId, slug])
+  @@map("forum_topics")
+  @@index([categoryId], name: "idx_forum_topics_category_id")
+  @@index([status, lastPostAt], name: "idx_forum_topics_status_last_post")
+  @@index([authorId, createdAt], name: "idx_forum_topics_author_created")
+}
+
+model ForumPost {
+  id             String    @id @default(uuid()) @db.Uuid
+  content        String
+  isAnonymous    Boolean   @default(false) @map("is_anonymous")
+  isEdited       Boolean   @default(false) @map("is_edited")
+  isSolution     Boolean   @default(false) @map("is_solution")
+  parentPostId   String?   @map("parent_post_id") @db.Uuid
+  topicId        String    @map("topic_id") @db.Uuid
+  authorId       String    @map("author_id") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  topic         ForumTopic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  author        UserProfile  @relation("PostAuthor", fields: [authorId], references: [id])
+  parentPost    ForumPost?   @relation("PostReplies", fields: [parentPostId], references: [id], onDelete: SetNull)
+  replies       ForumPost[]  @relation("PostReplies")
+  reactions     PostReaction[]
+
+  @@map("forum_posts")
+  @@index([topicId], name: "idx_forum_posts_topic_id")
+  @@index([authorId], name: "idx_forum_posts_author_id")
+  @@index([topicId, createdAt], name: "idx_forum_posts_topic_created")
+  @@index([authorId, createdAt], name: "idx_forum_posts_author_created")
+}
+
+model TopicSubscription {
+  userId           String   @map("user_id") @db.Uuid
+  topicId          String   @map("topic_id") @db.Uuid
+  subscriptionType String   @default("new_posts") @map("subscription_type") // 'new_posts', 'all_activity'
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user  UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic ForumTopic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([userId, topicId])
+  @@map("topic_subscriptions")
+}
+
+model CategorySubscription {
+  userId           String   @map("user_id") @db.Uuid
+  categoryId       String   @map("category_id") @db.Uuid
+  subscriptionType String   @default("new_topics") @map("subscription_type") // 'new_topics', 'all_activity'
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user     UserProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([userId, categoryId])
+  @@map("category_subscriptions")
+}
+
+model PostReaction {
+  id           String   @id @default(uuid()) @db.Uuid
+  postId       String   @map("post_id") @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  reactionType String   @map("reaction_type") // 'like', 'love', 'laugh', 'helpful', 'thumbs_up', etc.
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  post ForumPost   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId, reactionType])
+  @@map("post_reactions")
+}
+
+model Comment {
+  id         String   @id @default(uuid()) @db.Uuid
+  content    String
+  parentType String   @map("parent_type") // 'event', 'announcement', 'maintenance_request', etc.
+  parentId   String   @map("parent_id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+  @@index([parentType, parentId], name: "idx_comments_parent")
+}
+
+// ================================================================
+// EVENT MODELS
+// ================================================================
+
+model Event {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  description  String?
+  startTime    DateTime  @map("start_time")
+  endTime      DateTime  @map("end_time")
+  location     String?
+  maxAttendees Int?      @map("max_attendees")
+  isPrivate    Boolean   @default(false) @map("is_private")
+  createdBy    String    @map("created_by") @db.Uuid
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  creator   UserProfile     @relation("EventCreator", fields: [createdBy], references: [id])
+  attendees EventAttendee[]
+
+  @@map("events")
+  @@index([startTime], name: "idx_events_start_time")
+  @@index([startTime, endTime], name: "idx_events_time_range")
+  @@index([createdBy, startTime], name: "idx_events_creator_start")
+}
+
+model EventAttendee {
+  id           String              @id @default(uuid()) @db.Uuid
+  eventId      String              @map("event_id") @db.Uuid
+  userId       String              @map("user_id") @db.Uuid
+  status       EventAttendeeStatus @default(GOING)
+  registeredAt DateTime            @default(now()) @map("registered_at")
+
+  // Relations
+  event Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@map("event_attendees")
+  @@index([eventId, status], name: "idx_event_attendees_event_status")
+}
+
+// ================================================================
+// FILE & DOCUMENT MODELS
+// ================================================================
+
+model File {
+  id               String    @id @default(uuid()) @db.Uuid
+  originalFilename String    @map("original_filename")
+  storagePath      String    @map("storage_path")
+  fileType         String    @map("file_type")
+  mimeType         String    @map("mime_type")
+  fileSize         BigInt    @map("file_size")
+  sha256Hash       String?   @map("sha256_hash")
+  metadata         Json?     @default("{}")
+  status           String    @default("processing") // 'processing', 'ready', 'error'
+  privacyLevel     String    @default("residents") @map("privacy_level") // 'public', 'residents', 'private'
+  uploadedBy       String    @map("uploaded_by") @db.Uuid
+  uploadedAt       DateTime  @default(now()) @map("uploaded_at")
+
+  // Relations
+  uploader         UserProfile      @relation("FileUploader", fields: [uploadedBy], references: [id])
+  attachments      FileAttachment[]
+  categoryItems    FileCategoryItem[]
+  forumCategoryIcons ForumCategory[] @relation("CategoryIcon")
+
+  @@map("files")
+  @@index([uploadedBy, uploadedAt], name: "idx_files_uploader_uploaded")
+  @@index([fileType, status], name: "idx_files_type_status")
+}
+
+model FileCategory {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @unique
+  description String?
+  colorCode   String?   @map("color_code")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  items FileCategoryItem[]
+
+  @@map("file_categories")
+}
+
+model FileCategoryItem {
+  fileId     String @map("file_id") @db.Uuid
+  categoryId String @map("category_id") @db.Uuid
+
+  // Relations
+  file     File         @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  category FileCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([fileId, categoryId])
+  @@map("file_category_items")
+}
+
+model FileAttachment {
+  id             String   @id @default(uuid()) @db.Uuid
+  fileId         String   @map("file_id") @db.Uuid
+  attachableType String   @map("attachable_type") // 'forum_post', 'event', 'maintenance_request', etc.
+  attachableId   String   @map("attachable_id") @db.Uuid
+  description    String?
+  displayOrder   Int      @default(0) @map("display_order")
+  addedBy        String   @map("added_by") @db.Uuid
+  addedAt        DateTime @default(now()) @map("added_at")
+
+  // Relations
+  file   File        @relation(fields: [fileId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  adder  UserProfile @relation("AttachmentAdder", fields: [addedBy], references: [id])
+
+  @@map("file_attachments")
+  @@index([attachableType, attachableId], name: "idx_file_attachments_attachable")
+  @@index([fileId], name: "idx_file_attachments_file_id")
+}
+
+model Document {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+  category    String?
+  uploadedBy  String   @map("uploaded_by") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  uploader UserProfile @relation("DocumentUploader", fields: [uploadedBy], references: [id])
+
+  @@map("documents")
+}
+
+// ================================================================
+// MAINTENANCE MODELS
+// ================================================================
+
+model MaintenanceRequest {
+  id              String              @id @default(uuid()) @db.Uuid
+  title           String
+  description     String
+  priority        MaintenancePriority @default(MEDIUM)
+  status          MaintenanceStatus   @default(PENDING)
+  unitId          String?             @map("unit_id") @db.Uuid
+  reportedBy      String              @map("reported_by") @db.Uuid
+  assignedTo      String?             @map("assigned_to") @db.Uuid
+  resolutionNotes String?             @map("resolution_notes")
+  resolvedAt      DateTime?           @map("resolved_at")
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  // Relations
+  unit     Unit?        @relation(fields: [unitId], references: [id])
+  reporter UserProfile  @relation("MaintenanceReporter", fields: [reportedBy], references: [id])
+  assignee UserProfile? @relation("MaintenanceAssignee", fields: [assignedTo], references: [id])
+
+  @@map("maintenance_requests")
+  @@index([status], name: "idx_maintenance_requests_status")
+  @@index([unitId], name: "idx_maintenance_requests_unit_id")
+  @@index([status, priority], name: "idx_maintenance_requests_status_priority")
+  @@index([reportedBy, createdAt], name: "idx_maintenance_requests_reporter_created")
+}
+
+// ================================================================
+// CHAT & AI MODELS
+// ================================================================
+
+model ChatSession {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  title      String    @default("New Chat")
+  isArchived Boolean?  @default(false) @map("is_archived")
+  metadata   Json?     @default("{}")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user     UserProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id                   String   @id @default(uuid()) @db.Uuid
+  sessionId            String   @map("session_id") @db.Uuid
+  userId               String   @map("user_id") @db.Uuid
+  content              String
+  role                 String   // 'user', 'assistant', 'system'
+  metadata             Json?    @default("{}")
+  referencedDocuments  Json?    @default("[]") @map("referenced_documents")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  // Relations
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    UserProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+  @@index([sessionId, createdAt], name: "idx_chat_messages_session_created")
+  @@index([userId, createdAt], name: "idx_chat_messages_user_created")
+}
+
+model AiConfiguration {
+  id           String   @id @default(uuid()) @db.Uuid
+  modelName    String   @map("model_name")
+  temperature  Decimal  @default(0.7) @db.Decimal(3, 2)
+  maxTokens    Int?     @map("max_tokens")
+  systemPrompt String?  @map("system_prompt")
+  isActive     Boolean? @default(true) @map("is_active")
+  createdBy    String   @map("created_by") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("ai_configuration")
+}
+
+model AiContextSource {
+  id              String   @id @default(uuid()) @db.Uuid
+  name            String
+  description     String?
+  sourceType      String   @map("source_type") // 'file', 'database', 'api', 'manual'
+  contentPath     String?  @map("content_path")
+  isEnabled       Boolean? @default(true) @map("is_enabled")
+  priority        Int      @default(0)
+  lastUpdated     DateTime @default(now()) @map("last_updated")
+  updateFrequency String   @default("manual") @map("update_frequency") // 'manual', 'hourly', 'daily', 'weekly'
+  createdBy       String   @map("created_by") @db.Uuid
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("ai_context_sources")
+}
+
+// ================================================================
+// SURVEY MODELS
+// ================================================================
+
+model Survey {
+  id          String    @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+  status      String    @default("draft") // 'draft', 'published', 'closed'
+  published   Boolean?  @default(false)
+  expiresAt   DateTime? @map("expires_at")
+  createdBy   String    @map("created_by") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  creator   UserProfile       @relation("SurveyCreator", fields: [createdBy], references: [id])
+  questions SurveyQuestion[]
+  responses SurveyResponse[]
+
+  @@map("surveys")
+}
+
+model SurveyQuestion {
+  id            String  @id @default(uuid()) @db.Uuid
+  surveyId      String  @map("survey_id") @db.Uuid
+  questionText  String  @map("question_text")
+  questionType  String  @map("question_type") // 'text', 'multiple_choice', 'checkbox', 'rating', 'date'
+  options       Json?   // For multiple choice, checkboxes, etc.
+  required      Boolean? @default(false)
+  orderPosition Int     @default(0) @map("order_position")
+
+  // Relations
+  survey    Survey             @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  responses QuestionResponse[]
+
+  @@map("survey_questions")
+  @@index([surveyId], name: "idx_survey_questions_survey_id")
+}
+
+model SurveyResponse {
+  id          String   @id @default(uuid()) @db.Uuid
+  surveyId    String   @map("survey_id") @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  // Relations
+  survey    Survey             @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  user      UserProfile        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  responses QuestionResponse[]
+
+  @@unique([surveyId, userId])
+  @@map("survey_responses")
+}
+
+model QuestionResponse {
+  id               String  @id @default(uuid()) @db.Uuid
+  surveyResponseId String  @map("survey_response_id") @db.Uuid
+  questionId       String  @map("question_id") @db.Uuid
+  answerText       String? @map("answer_text")
+  selectedOptions  Json?   @map("selected_options")
+
+  // Relations
+  surveyResponse SurveyResponse  @relation(fields: [surveyResponseId], references: [id], onDelete: Cascade)
+  question       SurveyQuestion  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([surveyResponseId, questionId])
+  @@map("question_responses")
+}
+
+// ================================================================
+// MEMBERSHIP & SOCIAL MODELS
+// ================================================================
+
+model AlumniMembershipTier {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @unique
+  description String?
+  benefits    Json      @default("[]")
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  memberships UserMembership[]
+
+  @@map("alumni_membership_tiers")
+}
+
+model UserMembership {
+  id                 String    @id @default(uuid()) @db.Uuid
+  userId             String    @map("user_id") @db.Uuid
+  membershipTierId   String?   @map("membership_tier_id") @db.Uuid
+  startDate          DateTime  @default(now()) @map("start_date")
+  endDate            DateTime? @map("end_date")
+  renewalDate        DateTime? @map("renewal_date")
+  paymentStatus      String?   @map("payment_status") // 'pending', 'paid', 'overdue', 'cancelled'
+  approvedBy         String?   @map("approved_by") @db.Uuid
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user           UserProfile          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  membershipTier AlumniMembershipTier? @relation(fields: [membershipTierId], references: [id])
+
+  @@map("user_memberships")
+}
+
+model UserConnection {
+  id              String           @id @default(uuid()) @db.Uuid
+  userId          String           @map("user_id") @db.Uuid
+  connectedUserId String           @map("connected_user_id") @db.Uuid
+  status          ConnectionStatus @default(PENDING)
+  establishedAt   DateTime?        @map("established_at")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  user          UserProfile @relation("UserConnectionOwner", fields: [userId], references: [id], onDelete: Cascade)
+  connectedUser UserProfile @relation("ConnectedUser", fields: [connectedUserId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, connectedUserId])
+  @@map("user_connections")
+  @@index([userId, status], name: "idx_user_connections_user_status")
+}

@@ -8,6 +8,9 @@ This directory contains documentation for the 10 Ocean Tenant Association web ap
 - [Authentication](./schema/auth.md) - User authentication and authorization
 - [Data Models](./schema/data-models.md) - Core data models and relationships
 - [Database Policies](./schema/policies.md) - Row-level security policies
+- [Migration PRD](./migration-prd.md) - Product Requirements Document for migration from Supabase to Neon + Prisma
+- [Role-Based Access Control](./role-based-access-control.md) - RBAC system implementation
+- [Inngest Architecture](./inngest-architecture.md) - Event-driven background processing
 
 ## Project Overview
 

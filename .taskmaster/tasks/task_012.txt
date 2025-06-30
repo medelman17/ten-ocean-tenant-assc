@@ -1,0 +1,20 @@
+# Task ID: 12
+# Title: Migrate and enhance community features
+# Status: pending
+# Dependencies: 4, 7
+# Priority: medium
+# Description: Update community event management, forums, and surveys to use the new stack while maintaining all existing functionality.
+# Details:
+1. Refactor event management using Prisma models
+2. Update forum functionality with new database queries
+3. Migrate survey system to use Prisma for data storage
+4. Implement real-time updates for forums using Pusher
+5. Update RSVP system for events
+6. Enhance survey creation and response collection
+7. Implement analytics for community engagement
+
+# Test Strategy:
+1. Test event creation, editing, and RSVP functionality
+2. Verify forum posting and real-time updates
+3. Validate survey creation, response, and result tabulation
+4. Test community analytics generation

@@ -1,0 +1,20 @@
+# Task ID: 6
+# Title: Implement Cloudflare R2 for file storage
+# Status: pending
+# Dependencies: 4
+# Priority: medium
+# Description: Migrate file storage from Supabase Storage to Cloudflare R2 and update file management functionality.
+# Details:
+1. Set up Cloudflare R2 account and create a bucket
+2. Install AWS SDK for JavaScript: `npm install @aws-sdk/client-s3`
+3. Configure R2 credentials and endpoint in environment variables
+4. Create a service for R2 operations (upload, download, delete)
+5. Update file upload/download APIs to use R2
+6. Implement file privacy controls using R2 bucket policies
+7. Update file URL generation to use R2 URLs
+
+# Test Strategy:
+1. Test file upload, download, and delete operations
+2. Verify file privacy controls
+3. Test file access permissions
+4. Validate file URL generation and accessibility

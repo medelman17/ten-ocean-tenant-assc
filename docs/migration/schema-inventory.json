@@ -1,0 +1,183 @@
+{
+  "schemaExport": {
+    "exportDate": "2025-01-30",
+    "sourceSystem": "Supabase PostgreSQL",
+    "targetSystem": "Neon PostgreSQL + Prisma ORM",
+    "migrationStatus": "Phase 1 - Schema Export Complete"
+  },
+  "tables": {
+    "total": 32,
+    "categories": {
+      "user_authentication": ["user_profiles", "user_preferences", "user_skills", "user_roles", "user_connections"],
+      "rbac_system": ["roles", "floor_captain_assignments", "user_roles"],
+      "building_management": ["units", "maintenance_requests", "announcements"],
+      "forum_system": ["forum_categories", "forum_topics", "forum_posts", "post_reactions", "category_subscriptions", "topic_subscriptions"],
+      "event_management": ["events", "event_attendees"],
+      "file_management": ["files", "file_categories", "file_category_items", "file_attachments"],
+      "surveys_comments": ["surveys", "survey_questions", "survey_responses", "question_responses", "comments"],
+      "ai_chat": ["ai_configuration", "ai_context_sources", "chat_sessions", "chat_messages"],
+      "membership": ["alumni_membership_tiers", "user_memberships", "documents"]
+    }
+  },
+  "dataTypes": {
+    "uuid": {
+      "count": 32,
+      "usage": "Primary keys and foreign keys",
+      "migration_note": "All tables use UUID primary keys with uuid_generate_v4()"
+    },
+    "jsonb": {
+      "tables": [
+        "alumni_membership_tiers.benefits",
+        "chat_messages.metadata",
+        "chat_messages.referenced_documents",
+        "chat_sessions.metadata",
+        "files.metadata",
+        "roles.permissions",
+        "survey_questions.options",
+        "user_preferences.notification_settings",
+        "user_preferences.communication_preferences",
+        "user_preferences.privacy_settings",
+        "user_preferences.accessibility_settings",
+        "user_profiles.emergency_contact",
+        "user_profiles.social_media",
+        "user_skills.volunteer_availability"
+      ],
+      "migration_note": "JSONB fields require careful mapping to Prisma Json type"
+    },
+    "arrays": {
+      "text_arrays": ["user_profiles.interests", "user_profiles.skills", "user_profiles.languages", "user_skills.skills", "user_skills.interests", "user_skills.community_involvement"],
+      "migration_note": "Text arrays need proper Prisma array syntax"
+    }
+  },
+  "relationships": {
+    "one_to_many": [
+      "user_profiles -> forum_posts",
+      "user_profiles -> events",
+      "units -> user_profiles",
+      "forum_categories -> forum_topics",
+      "forum_topics -> forum_posts",
+      "surveys -> survey_questions",
+      "survey_responses -> question_responses"
+    ],
+    "many_to_many": [
+      "users <-> roles (via user_roles)",
+      "files <-> categories (via file_category_items)",
+      "events <-> users (via event_attendees)",
+      "forum_topics <-> users (via topic_subscriptions)",
+      "forum_categories <-> users (via category_subscriptions)"
+    ],
+    "polymorphic": ["comments (parent_type + parent_id)", "file_attachments (attachable_type + attachable_id)"]
+  },
+  "indexes": {
+    "performance": [
+      "idx_comments_parent",
+      "idx_events_start_time",
+      "idx_file_attachments_attachable",
+      "idx_file_attachments_file_id",
+      "idx_forum_posts_author_id",
+      "idx_forum_posts_topic_id",
+      "idx_forum_topics_category_id",
+      "idx_maintenance_requests_status",
+      "idx_maintenance_requests_unit_id",
+      "idx_survey_questions_survey_id",
+      "idx_user_profiles_residency_status",
+      "idx_user_profiles_unit_id",
+      "idx_user_profiles_verification_status"
+    ],
+    "unique_constraints": [
+      "alumni_membership_tiers_name_key",
+      "event_attendees_event_id_user_id_key",
+      "file_categories_name_key",
+      "floor_captain_assignments_user_id_floor_number_key",
+      "forum_categories_slug_key",
+      "forum_topics_category_id_slug_key",
+      "post_reactions_post_id_user_id_reaction_type_key",
+      "question_responses_survey_response_id_question_id_key",
+      "roles_name_key",
+      "survey_responses_survey_id_user_id_key",
+      "units_unit_number_key",
+      "user_connections_user_id_connected_user_id_key",
+      "user_roles_user_id_role_id_key"
+    ]
+  },
+  "security": {
+    "rls_enabled_tables": ["announcements", "chat_messages", "chat_sessions", "documents", "events", "files"],
+    "rls_policies": [
+      {
+        "table": "user_profiles",
+        "policies": ["Admins can view all profiles", "Floor captains can view profiles on their floors", "Users can view their own profile", "Verified users can view other residents' profiles"]
+      }
+    ],
+    "privacy_levels": ["public", "residents", "floor", "private"]
+  },
+  "functions": {
+    "custom_functions": [
+      {
+        "name": "update_timestamp",
+        "purpose": "Automatically update updated_at columns",
+        "migration_strategy": "Replace with Prisma middleware or application logic"
+      },
+      {
+        "name": "update_forum_topic_last_post_time",
+        "purpose": "Update topic timestamp when posts are created",
+        "migration_strategy": "Replace with Prisma middleware or application logic"
+      }
+    ]
+  },
+  "triggers": [
+    {
+      "name": "update_user_profile_timestamp",
+      "table": "user_profiles",
+      "event": "BEFORE UPDATE",
+      "function": "update_timestamp"
+    },
+    {
+      "name": "update_topic_timestamp",
+      "table": "forum_posts",
+      "event": "AFTER INSERT",
+      "function": "update_forum_topic_last_post_time"
+    }
+  ],
+  "migration_checklist": {
+    "completed": [
+      "✅ Schema structure analysis",
+      "✅ Table inventory and categorization",
+      "✅ Relationship mapping",
+      "✅ Index and constraint identification",
+      "✅ Data type analysis",
+      "✅ RLS policy documentation",
+      "✅ Custom function identification"
+    ],
+    "next_steps": [
+      "Generate Prisma schema from export",
+      "Manual schema adjustments and optimizations",
+      "Migrate custom functions to application logic",
+      "Implement security policies in application layer",
+      "Create migration scripts",
+      "Test migration process",
+      "Validate schema integrity"
+    ]
+  },
+  "migration_risks": [
+    {
+      "category": "Authentication",
+      "risk": "Loss of Supabase Auth integration",
+      "mitigation": "Implement custom auth solution before data migration"
+    },
+    {
+      "category": "Real-time Features",
+      "risk": "Loss of Supabase Realtime subscriptions",
+      "mitigation": "Implement WebSocket or SSE alternative"
+    },
+    {
+      "category": "File Storage",
+      "risk": "Supabase Storage file access breakage",
+      "mitigation": "Migrate files to new storage solution with URL updates"
+    },
+    {
+      "category": "Data Integrity",
+      "risk": "Foreign key constraint violations during migration",
+      "mitigation": "Comprehensive data validation and cleanup scripts"
+    }
+  ]
+}

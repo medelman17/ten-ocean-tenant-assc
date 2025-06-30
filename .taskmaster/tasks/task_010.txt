@@ -1,0 +1,20 @@
+# Task ID: 10
+# Title: Migrate and test role-based access control
+# Status: pending
+# Dependencies: 5
+# Priority: high
+# Description: Ensure the existing role-based access control system is preserved and functional with the new stack.
+# Details:
+1. Map existing roles (Admin, FloorCaptain, Resident, Alumni) to Auth.js
+2. Implement role assignment and management using Prisma
+3. Create middleware for role-based route protection
+4. Update client-side components to respect user roles
+5. Implement row-level security in Prisma queries based on user roles
+6. Create admin interface for role management
+7. Ensure role inheritance and hierarchy is maintained
+
+# Test Strategy:
+1. Test access control for all user roles
+2. Verify middleware protection for restricted routes
+3. Validate row-level security in database queries
+4. Test role assignment and management functionality
