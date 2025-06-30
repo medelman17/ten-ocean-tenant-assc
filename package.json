@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest --testPathIgnorePatterns=auth-middleware.test.ts,email-notifications.test.ts",
@@ -13,8 +13,14 @@
     "test:coverage": "jest --coverage",
     "prepare": "husky",
     "pre-push": "pnpm lint",
-    "db:push": "node scripts/supabase-env.js db push",
-    "db:pull": "node scripts/supabase-env.js db pull"
+    "postinstall": "prisma generate",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:pull": "prisma db pull",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset"
   },
   "dependencies": {
     "@hookform/resolvers": "5.0.1",
